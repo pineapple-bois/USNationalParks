@@ -1,4 +1,4 @@
-# Biodiversity in the United States National Park system
+# Bird of Prey in the United States National Park system
 
 ---
 This project follows from my EDA project [North American Birds of Prey](https://github.com/pineapple-bois/Biodiversity-in-National-Parks) which utilised an abridged version of `species.csv` provided by [Codecademy](https://www.codecademy.com)
@@ -40,7 +40,7 @@ With Columns;
 ---
 ## Scope of the project
 
-### Birds of Prey in the SW United States.
+### Birds of Prey in the United States.
 
 We define birds of prey/predatory birds as [Raptors](https://www.blm.gov/sites/default/files/documents/files/Morley-Nelson-Snake-River-Birds-Of-Prey_More-About-Raptors.pdf) 
 
