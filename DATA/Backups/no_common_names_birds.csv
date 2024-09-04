@@ -1,0 +1,42 @@
+,species_id,park_code,park_name,order,family,scientific_name,common_names,record_status,occurrence,nativeness,abundance,seasonality,conservation_status,is_protected
+26320,DEVA-1235,DEVA,Death Valley,Accipitriformes,Cathartidae,Pseudogryphus californianus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26367,DEVA-1282,DEVA,Death Valley,Apodiformes,Apodidae,Nephoecetes niger,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26472,DEVA-1387,DEVA,Death Valley,Gaviiformes,Gaviidae,Urinator imber,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26473,DEVA-1388,DEVA,Death Valley,Gaviiformes,Gaviidae,Urinator lumme,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26474,DEVA-1389,DEVA,Death Valley,Gaviiformes,Gaviidae,Urinator pacificus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26507,DEVA-1422,DEVA,Death Valley,Passeriformes,Cardinalidae,Piranga hepatica,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26528,DEVA-1443,DEVA,Death Valley,Passeriformes,Corvidae,Picicorvus columbianus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26551,DEVA-1466,DEVA,Death Valley,Passeriformes,Emberizidae,Peucaea cassini,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26552,DEVA-1467,DEVA,Death Valley,Passeriformes,Emberizidae,Peucaea ruficeps,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26617,DEVA-1532,DEVA,Death Valley,Passeriformes,Mimidae,Harporhynchus redivivus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26717,DEVA-1632,DEVA,Death Valley,Passeriformes,Turdidae,Turdus aonalaschkae,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26721,DEVA-1636,DEVA,Death Valley,Passeriformes,Turdidae,Turdus ustulatus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26772,DEVA-1687,DEVA,Death Valley,Pelecaniformes,Pelecanidae,Pelecanus californicus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26795,DEVA-1710,DEVA,Death Valley,Piciformes,Picidae,Xenopicus albolarvatus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+26820,DEVA-1735,DEVA,Death Valley,Strigiformes,Strigidae,Syrnium occidentale,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+37569,GLBA-1204,GLBA,Glacier Bay,Passeriformes,Alaudidae,Eromophila alpestris,,Approved,Present,Native,Rare,Migratory,Least Concern,False
+39489,GRBA-1167,GRBA,Great Basin,Charadriiformes,Scolopacidae,Capella gallinago,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+39492,GRBA-1170,GRBA,Great Basin,Charadriiformes,Scolopacidae,Micropalama himantopus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+39512,GRBA-1190,GRBA,Great Basin,Galliformes,Odontophoridae,Lophortyx californica,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+39513,GRBA-1191,GRBA,Great Basin,Galliformes,Odontophoridae,Lophortyx gambelii,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+39528,GRBA-1206,GRBA,Great Basin,Passeriformes,Alaudidae,Eromophila alpestris,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+39560,GRBA-1238,GRBA,Great Basin,Passeriformes,Emberizidae,Chlorura chlorura,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+39638,GRBA-1316,GRBA,Great Basin,Passeriformes,Paridae,Baeolophus griseus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+39716,GRBA-1394,GRBA,Great Basin,Passeriformes,Tyrannidae,Nuttallornis borealis,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+39729,GRBA-1407,GRBA,Great Basin,Piciformes,Picidae,Dendrocopos villosus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+39752,GRBA-1430,GRBA,Great Basin,Strigiformes,Strigidae,Speotyto cunicularia,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+86453,PINN-1226,PINN,Pinnacles,Strigiformes,Strigidae,Glaucidium californicum,,Approved,Not Confirmed,Native,Unknown,Unknown,Least Concern,False
+87798,REDW-1155,REDW,Redwood,,,Erolia ptilochemis,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+87800,REDW-1157,REDW,Redwood,Galliformes,Odontophoridae,Lophortyx pictus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+87839,REDW-1197,REDW,Redwood,Anseriformes,Anatidae,Branta nigricans,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+87852,REDW-1210,REDW,Redwood,Anseriformes,Anatidae,Mareca americana,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+87888,REDW-1246,REDW,Redwood,Charadriiformes,Alcidae,Lunda cirrhata,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+87900,REDW-1258,REDW,Redwood,Charadriiformes,Charadriidae,Oxyechus vociferous,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+87956,REDW-1314,REDW,Redwood,Charadriiformes,Scolopacidae,Capella gallinago,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+88003,REDW-1361,REDW,Redwood,Galliformes,Odontophoridae,Lophortyx californica,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+88186,REDW-1544,REDW,Redwood,Passeriformes,Troglodytidae,Telmatodytes palustris,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+88211,REDW-1569,REDW,Redwood,Passeriformes,Tyrannidae,Nuttallornis borealis,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+88241,REDW-1599,REDW,Redwood,Piciformes,Picidae,Dendrocopos pubescens,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+88242,REDW-1600,REDW,Redwood,Piciformes,Picidae,Dendrocopos villosus,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+108307,WICA-1100,WICA,Wind Cave,Accipitriformes,Accipitridae,Northern Harrier,,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False
+111476,YELL-1078,YELL,Yellowstone,Passeriformes,Parulidae,Geothlypis tolomiei,,Approved,Present,Native,Uncommon,Breeder,Least Concern,False
