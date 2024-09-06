@@ -1043,7 +1043,7 @@ species_code,order,family,scientific_name,common_name,raptor_group
 1042,Suliformes,Sulidae,Sula leucogaster,Brown Booby,N/A
 1043,Suliformes,Sulidae,Sula nebouxii,Blue-Footed Booby,N/A
 1044,Suliformes,Sulidae,Sula sula,Red-Footed Booby,N/A
-1045,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk"
+1045,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl
 1046,Charadriiformes,Alcidae,Synthliboramphus antiquus,Ancient Murrelet,N/A
 1047,Charadriiformes,Alcidae,Synthliboramphus craveri,Craveri's Murrelet,N/A
 1048,Charadriiformes,Alcidae,Synthliboramphus hypoleucus,"Xantus' Murrelet, Xantus's Murrelet",N/A

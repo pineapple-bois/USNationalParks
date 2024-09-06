@@ -357,7 +357,7 @@ ACAD-1409,ACAD,Acadia,Strigiformes,Strigidae,Bubo scandiacus,Snowy Owl,Owl,Appro
 ACAD-1410,ACAD,Acadia,Strigiformes,Strigidae,Megascops asio,Eastern Screech-Owl,Owl,Approved,Present,Not Native,Unknown,Vagrant,Least Concern,False,Strigidae,True
 ACAD-1411,ACAD,Acadia,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Not Confirmed,Not Native,Unknown,Vagrant,Least Concern,False,Strigidae,True
 ACAD-1412,ACAD,Acadia,Strigiformes,Strigidae,Strix varia,Barred Owl,Owl,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,Strigidae,True
-ACAD-1413,ACAD,Acadia,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Not Native,Occasional,Vagrant,Least Concern,False,Strigidae,True
+ACAD-1413,ACAD,Acadia,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Not Native,Occasional,Vagrant,Least Concern,False,Strigidae,True
 ACAD-1414,ACAD,Acadia,Strigiformes,Tytonidae,Tyto alba,Barn Owl,Owl,Approved,Not Present (Historical Report),Not Native,Unknown,Vagrant,Least Concern,False,Tytonidae,True
 ACAD-1415,ACAD,Acadia,Suliformes,Fregatidae,Fregata magnificens,Magnificent Frigatebird,N/A,Approved,Not Confirmed,Not Native,Unknown,Vagrant,Least Concern,False,,False
 ACAD-1416,ACAD,Acadia,Suliformes,Phalacrocoracidae,Phalacrocorax auritus,Double-Crested Cormorant,N/A,Approved,Present,Native,Abundant,Resident,Species of Concern,True,,False
@@ -3903,7 +3903,7 @@ DENA-1217,DENA,Denali,Strigiformes,Strigidae,Asio flammeus,Short-Eared Owl,Owl,A
 DENA-1218,DENA,Denali,Strigiformes,Strigidae,Bubo scandiacus,Snowy Owl,Owl,Approved,Present,Native,Occasional,Unknown,Least Concern,False,Strigidae,True
 DENA-1219,DENA,Denali,Strigiformes,Strigidae,Bubo virginianus,Great Horned Owl,Owl,Approved,Present,Native,Common,Breeder,Least Concern,False,Strigidae,True
 DENA-1220,DENA,Denali,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Present,Native,Occasional,Unknown,Least Concern,False,Strigidae,True
-DENA-1221,DENA,Denali,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Common,Breeder,Least Concern,False,Strigidae,True
+DENA-1221,DENA,Denali,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Common,Breeder,Least Concern,False,Strigidae,True
 DEVA-1212,DEVA,Death Valley,Passeriformes,Parulidae,Dendroica petechia,Yellow Warbler,N/A,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False,,False
 DEVA-1213,DEVA,Death Valley,Passeriformes,Paridae,Parus inornatus griseus,Plain Titmouse (griseus subspecies),N/A,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False,,False
 DEVA-1214,DEVA,Death Valley,Passeriformes,Parulidae,Dendroica occidentalis,Hermit Warbler,N/A,Approved,Present,Native,Rare,Migratory,Least Concern,False,,False
@@ -5175,7 +5175,7 @@ GAAR-1168,GAAR,Gates Of The Arctic,Strigiformes,Strigidae,Asio flammeus,Short-Ea
 GAAR-1169,GAAR,Gates Of The Arctic,Strigiformes,Strigidae,Bubo virginianus,Great Horned Owl,Owl,Approved,Present,Native,Unknown,Breeder,Least Concern,False,Strigidae,True
 GAAR-1170,GAAR,Gates Of The Arctic,Strigiformes,Strigidae,Bubo scandiacus,Snowy Owl,Owl,Approved,Present,Native,Unknown,Breeder,Least Concern,False,Strigidae,True
 GAAR-1171,GAAR,Gates Of The Arctic,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Present,Native,Unknown,Unknown,Least Concern,False,Strigidae,True
-GAAR-1172,GAAR,Gates Of The Arctic,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Unknown,Breeder,Least Concern,False,Strigidae,True
+GAAR-1172,GAAR,Gates Of The Arctic,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Unknown,Breeder,Least Concern,False,Strigidae,True
 GLAC-1069,GLAC,Glacier,Accipitriformes,Accipitridae,Accipiter cooperii,Cooper's Hawk,Hawk,Approved,Present,Native,Uncommon,Breeder,Species of Concern,True,Accipitridae,True
 GLAC-1070,GLAC,Glacier,Accipitriformes,Accipitridae,Accipiter gentilis,Northern Goshawk,Hawk,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,Accipitridae,True
 GLAC-1071,GLAC,Glacier,Accipitriformes,Accipitridae,Accipiter striatus,Sharp-Shinned Hawk,Hawk,Approved,Present,Native,Uncommon,Breeder,Species of Concern,True,Accipitridae,True
@@ -5451,7 +5451,7 @@ GLAC-1340,GLAC,Glacier,Strigiformes,Strigidae,Bubo scandiacus,Snowy Owl,Owl,Appr
 GLAC-1341,GLAC,Glacier,Strigiformes,Strigidae,Megascops kennicottii,Western Screech-Owl,Owl,Approved,Present,Native,Rare,Breeder,Least Concern,False,Strigidae,True
 GLAC-1342,GLAC,Glacier,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Present,Native,Rare,Breeder,Least Concern,False,Strigidae,True
 GLAC-1343,GLAC,Glacier,Strigiformes,Strigidae,Strix varia,Barred Owl,Owl,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,Strigidae,True
-GLAC-1344,GLAC,Glacier,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Rare,Breeder,Least Concern,False,Strigidae,True
+GLAC-1344,GLAC,Glacier,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Rare,Breeder,Least Concern,False,Strigidae,True
 GLAC-1345,GLAC,Glacier,Suliformes,Phalacrocoracidae,Phalacrocorax auritus,Double-Crested Cormorant,N/A,Approved,Present,Native,Rare,Vagrant,Species of Concern,True,,False
 GLBA-1058,GLBA,Glacier Bay,Accipitriformes,Accipitridae,Accipiter gentilis,Northern Goshawk,Hawk,Approved,Present,Native,Rare,Breeder,Least Concern,False,Accipitridae,True
 GLBA-1059,GLBA,Glacier Bay,Accipitriformes,Accipitridae,Accipiter striatus,Sharp-Shinned Hawk,Hawk,Approved,Present,Native,Rare,Breeder,Species of Concern,True,Accipitridae,True
@@ -5702,7 +5702,7 @@ GLBA-1309,GLBA,Glacier Bay,Strigiformes,Strigidae,Glaucidium gnoma,"Mountain Pyg
 GLBA-1310,GLBA,Glacier Bay,Strigiformes,Strigidae,Megascops kennicottii,Western Screech-Owl,Owl,Approved,Present,Native,Rare,Breeder,Least Concern,False,Strigidae,True
 GLBA-1311,GLBA,Glacier Bay,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Present,Native,Occasional,Unknown,Least Concern,False,Strigidae,True
 GLBA-1312,GLBA,Glacier Bay,Strigiformes,Strigidae,Strix varia,Barred Owl,Owl,Approved,Present,Native,Occasional,Vagrant,Least Concern,False,Strigidae,True
-GLBA-1313,GLBA,Glacier Bay,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Rare,Unknown,Least Concern,False,Strigidae,True
+GLBA-1313,GLBA,Glacier Bay,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Rare,Unknown,Least Concern,False,Strigidae,True
 GLBA-1314,GLBA,Glacier Bay,Suliformes,Phalacrocoracidae,Phalacrocorax auritus,Double-Crested Cormorant,N/A,Approved,Present,Native,Uncommon,Resident,Species of Concern,True,,False
 GLBA-1315,GLBA,Glacier Bay,Suliformes,Phalacrocoracidae,Phalacrocorax pelagicus,Pelagic Cormorant,N/A,Approved,Present,Native,Abundant,Breeder,Least Concern,False,,False
 GRBA-1103,GRBA,Great Basin,Passeriformes,Fringillidae,Carduelis pinus vagans,Pine Siskin (vagans subspecies),N/A,In Review,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False,,False
@@ -8295,7 +8295,7 @@ ISRO-1281,ISRO,Isle Royale,Strigiformes,Strigidae,Bubo scandiacus,Snowy Owl,Owl,
 ISRO-1282,ISRO,Isle Royale,Strigiformes,Strigidae,Megascops asio,Eastern Screech-Owl,Owl,Approved,Not Confirmed,Native,Unknown,Unknown,Least Concern,False,Strigidae,True
 ISRO-1283,ISRO,Isle Royale,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Not Confirmed,Native,Unknown,Unknown,Least Concern,False,Strigidae,True
 ISRO-1284,ISRO,Isle Royale,Strigiformes,Strigidae,Strix varia,Barred Owl,Owl,Approved,Present,Native,Occasional,Migratory,Least Concern,False,Strigidae,True
-ISRO-1285,ISRO,Isle Royale,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Occasional,Breeder,Least Concern,False,Strigidae,True
+ISRO-1285,ISRO,Isle Royale,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Occasional,Breeder,Least Concern,False,Strigidae,True
 ISRO-1286,ISRO,Isle Royale,Suliformes,Phalacrocoracidae,Phalacrocorax auritus,Double-Crested Cormorant,N/A,Approved,Present,Native,Common,Breeder,Species of Concern,True,,False
 JOTR-1067,JOTR,Joshua Tree,Passeriformes,Emberizidae,Aimophila cassinii,Cassin's Sparrow,N/A,Approved,Not Confirmed,Native,Unknown,Unknown,Least Concern,False,,False
 JOTR-1068,JOTR,Joshua Tree,Passeriformes,Parulidae,Dendroica occidentalis,Hermit Warbler,N/A,Approved,Present,Native,Uncommon,Migratory,Least Concern,False,,False
@@ -8797,7 +8797,7 @@ KATM-1268,KATM,Katmai,Strigiformes,Strigidae,Asio flammeus,Short-Eared Owl,Owl,A
 KATM-1269,KATM,Katmai,Strigiformes,Strigidae,Bubo scandiacus,Snowy Owl,Owl,Approved,Present,Native,Rare,Unknown,Least Concern,False,Strigidae,True
 KATM-1270,KATM,Katmai,Strigiformes,Strigidae,Bubo virginianus,Great Horned Owl,Owl,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,Strigidae,True
 KATM-1271,KATM,Katmai,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,Strigidae,True
-KATM-1272,KATM,Katmai,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Rare,Breeder,Least Concern,False,Strigidae,True
+KATM-1272,KATM,Katmai,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Rare,Breeder,Least Concern,False,Strigidae,True
 KATM-1273,KATM,Katmai,Suliformes,Phalacrocoracidae,Phalacrocorax auritus,Double-Crested Cormorant,N/A,Approved,Present,Native,Uncommon,Breeder,Species of Concern,True,,False
 KATM-1274,KATM,Katmai,Suliformes,Phalacrocoracidae,Phalacrocorax pelagicus,Pelagic Cormorant,N/A,Approved,Present,Native,Uncommon,Resident,Least Concern,False,,False
 KATM-1275,KATM,Katmai,Suliformes,Phalacrocoracidae,Phalacrocorax urile,Red-Faced Cormorant,N/A,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,,False
@@ -9029,7 +9029,7 @@ KEFJ-1281,KEFJ,Kenai Fjords,Strigiformes,Strigidae,Bubo scandiacus,Snowy Owl,Owl
 KEFJ-1282,KEFJ,Kenai Fjords,Strigiformes,Strigidae,Bubo virginianus,Great Horned Owl,Owl,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,Strigidae,True
 KEFJ-1283,KEFJ,Kenai Fjords,Strigiformes,Strigidae,Megascops kennicottii,Western Screech-Owl,Owl,Approved,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False,Strigidae,True
 KEFJ-1284,KEFJ,Kenai Fjords,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False,Strigidae,True
-KEFJ-1285,KEFJ,Kenai Fjords,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False,Strigidae,True
+KEFJ-1285,KEFJ,Kenai Fjords,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False,Strigidae,True
 KEFJ-1286,KEFJ,Kenai Fjords,Suliformes,Phalacrocoracidae,Phalacrocorax auritus,Double-Crested Cormorant,N/A,Approved,Present,Native,Common,Breeder,Species of Concern,True,,False
 KEFJ-1287,KEFJ,Kenai Fjords,Suliformes,Phalacrocoracidae,Phalacrocorax pelagicus,Pelagic Cormorant,N/A,Approved,Present,Native,Common,Breeder,Least Concern,False,,False
 KEFJ-1288,KEFJ,Kenai Fjords,Suliformes,Phalacrocoracidae,Phalacrocorax penicillatus,Brandt's Cormorant,N/A,Approved,Not Confirmed,Unknown,Unknown,Unknown,Least Concern,False,,False
@@ -9158,7 +9158,7 @@ KOVA-1158,KOVA,Kobuk Valley,Strigiformes,Strigidae,Asio flammeus,Short-Eared Owl
 KOVA-1159,KOVA,Kobuk Valley,Strigiformes,Strigidae,Bubo virginianus,Great Horned Owl,Owl,Approved,Present,Native,Occasional,Breeder,Least Concern,False,Strigidae,True
 KOVA-1160,KOVA,Kobuk Valley,Strigiformes,Strigidae,Bubo scandiacus,Snowy Owl,Owl,Approved,Present,Native,Rare,Unknown,Least Concern,False,Strigidae,True
 KOVA-1161,KOVA,Kobuk Valley,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Not Confirmed,Native,Unknown,Unknown,Least Concern,False,Strigidae,True
-KOVA-1162,KOVA,Kobuk Valley,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Uncommon,Unknown,Least Concern,False,Strigidae,True
+KOVA-1162,KOVA,Kobuk Valley,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Uncommon,Unknown,Least Concern,False,Strigidae,True
 LACL-1050,LACL,Lake Clark,Accipitriformes,Accipitridae,Accipiter gentilis,Northern Goshawk,Hawk,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,Accipitridae,True
 LACL-1051,LACL,Lake Clark,Accipitriformes,Accipitridae,Accipiter striatus,Sharp-Shinned Hawk,Hawk,Approved,Present,Native,Uncommon,Breeder,Species of Concern,True,Accipitridae,True
 LACL-1052,LACL,Lake Clark,Accipitriformes,Accipitridae,Aquila chrysaetos,Golden Eagle,Eagle,Approved,Present,Native,Uncommon,Breeder,Species of Concern,True,Accipitridae,True
@@ -9338,7 +9338,7 @@ LACL-1236,LACL,Lake Clark,Strigiformes,Strigidae,Aegolius funereus,Boreal Owl,Ow
 LACL-1237,LACL,Lake Clark,Strigiformes,Strigidae,Asio flammeus,Short-Eared Owl,Owl,Approved,Present,Native,Uncommon,Breeder,Species of Concern,True,Strigidae,True
 LACL-1238,LACL,Lake Clark,Strigiformes,Strigidae,Bubo virginianus,Great Horned Owl,Owl,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,Strigidae,True
 LACL-1239,LACL,Lake Clark,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Not Confirmed,Native,Unknown,Unknown,Least Concern,False,Strigidae,True
-LACL-1240,LACL,Lake Clark,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Uncommon,Migratory,Least Concern,False,Strigidae,True
+LACL-1240,LACL,Lake Clark,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Uncommon,Migratory,Least Concern,False,Strigidae,True
 LACL-1241,LACL,Lake Clark,Suliformes,Phalacrocoracidae,Phalacrocorax auritus,Double-Crested Cormorant,N/A,Approved,Present,Native,Uncommon,Breeder,Species of Concern,True,,False
 LACL-1242,LACL,Lake Clark,Suliformes,Phalacrocoracidae,Phalacrocorax pelagicus,Pelagic Cormorant,N/A,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,,False
 LAVO-1100,LAVO,Lassen Volcanic,Passeriformes,Parulidae,Dendroica aestiva brewsteri,California Yellow Warbler,N/A,Approved,Present,Native,Common,Breeder,Least Concern,False,,False
@@ -13105,7 +13105,7 @@ VOYA-1295,VOYA,Voyageurs,Strigiformes,Strigidae,Bubo virginianus,Great Horned Ow
 VOYA-1296,VOYA,Voyageurs,Strigiformes,Strigidae,Bubo scandiacus,Snowy Owl,Owl,Approved,Present,Native,Uncommon,Resident,Least Concern,False,Strigidae,True
 VOYA-1297,VOYA,Voyageurs,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Present,Native,Uncommon,Resident,Least Concern,False,Strigidae,True
 VOYA-1298,VOYA,Voyageurs,Strigiformes,Strigidae,Strix varia,Barred Owl,Owl,Approved,Present,Native,Common,Resident,Least Concern,False,Strigidae,True
-VOYA-1299,VOYA,Voyageurs,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Rare,Migratory,Least Concern,False,Strigidae,True
+VOYA-1299,VOYA,Voyageurs,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Rare,Migratory,Least Concern,False,Strigidae,True
 VOYA-1300,VOYA,Voyageurs,Suliformes,Phalacrocoracidae,Phalacrocorax auritus,Double-Crested Cormorant,N/A,Approved,Present,Native,Common,Resident,Species of Concern,True,,False
 WICA-1089,WICA,Wind Cave,Accipitriformes,Accipitridae,Accipiter cooperii,Cooper's Hawk,Hawk,Approved,Present,Native,Uncommon,Breeder,Species of Concern,True,Accipitridae,True
 WICA-1090,WICA,Wind Cave,Accipitriformes,Accipitridae,Accipiter gentilis,Northern Goshawk,Hawk,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,Accipitridae,True
@@ -13546,7 +13546,7 @@ WRST-1266,WRST,Wrangell - St Elias,Strigiformes,Strigidae,Bubo scandiacus,Snowy 
 WRST-1267,WRST,Wrangell - St Elias,Strigiformes,Strigidae,Bubo virginianus,Great Horned Owl,Owl,Approved,Present,Native,Common,Breeder,Least Concern,False,Strigidae,True
 WRST-1268,WRST,Wrangell - St Elias,Strigiformes,Strigidae,Megascops kennicottii,Western Screech-Owl,Owl,Approved,Present,Native,Unknown,Unknown,Least Concern,False,Strigidae,True
 WRST-1269,WRST,Wrangell - St Elias,Strigiformes,Strigidae,Strix nebulosa,Great Gray Owl,Owl,Approved,Present,Native,Rare,Unknown,Least Concern,False,Strigidae,True
-WRST-1270,WRST,Wrangell - St Elias,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,"Owl, Hawk",Approved,Present,Native,Common,Breeder,Least Concern,False,Strigidae,True
+WRST-1270,WRST,Wrangell - St Elias,Strigiformes,Strigidae,Surnia ulula,Northern Hawk Owl,Owl,Approved,Present,Native,Common,Breeder,Least Concern,False,Strigidae,True
 WRST-1271,WRST,Wrangell - St Elias,Suliformes,Phalacrocoracidae,Phalacrocorax auritus,Double-Crested Cormorant,N/A,Approved,Present,Native,Common,Breeder,Species of Concern,True,,False
 WRST-1272,WRST,Wrangell - St Elias,Suliformes,Phalacrocoracidae,Phalacrocorax pelagicus,Pelagic Cormorant,N/A,Approved,Present,Native,Common,Breeder,Least Concern,False,,False
 YELL-1078,YELL,Yellowstone,Passeriformes,Parulidae,Oporornis tolmiei,Macgillivray's Warbler,N/A,Approved,Present,Native,Uncommon,Breeder,Least Concern,False,,False
