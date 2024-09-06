@@ -2,14 +2,15 @@ import pandas as pd
 from collections import Counter
 
 
-def process_scientific_names(df, condition=2):
+def process_scientific_names(df, condition=2, print_info=True):
     """
     Process the scientific names in the birds DataFrame to categorize and count common names
     based on the word count condition (1, 2, or >2 words).
 
     Args:
-    birds_df (pd.DataFrame): The DataFrame containing the 'scientific_name' and 'common_names' columns.
+    df (pd.DataFrame): The DataFrame containing the 'scientific_name' and 'common_names' columns.
     condition (int): The word count condition (1 for single-word, 2 for two-word, 3 for more than two words).
+    print_info (bool): Whether to print information about the counts. Default is True.
 
     Returns:
     dict: Contains lists of scientific names with no common names, single common names, and multiple common names.
@@ -23,13 +24,16 @@ def process_scientific_names(df, condition=2):
     # Choose the subset to process based on the condition argument
     if condition == 1:
         target_sci_names = single_sci_names
-        print("Single Scientific Name Count (1 word):", len(single_sci_names))
+        if print_info:
+            print("Single Scientific Name Count (1 word):", len(single_sci_names))
     elif condition == 2:
         target_sci_names = standard_sci_names
-        print("Standard Scientific Names Count (2 words):", len(standard_sci_names))
+        if print_info:
+            print("Standard Scientific Names Count (2 words):", len(standard_sci_names))
     elif condition == 3:
         target_sci_names = extended_sci_names
-        print("Extended Scientific Names Count (> 2 words):", len(extended_sci_names))
+        if print_info:
+            print("Extended Scientific Names Count (> 2 words):", len(extended_sci_names))
     else:
         raise ValueError("Condition must be 1 (single-word), 2 (two-word), or 3 (more than two words).")
 
@@ -55,10 +59,11 @@ def process_scientific_names(df, condition=2):
         else:
             single_common_names.append((sci_name, counts))
 
-    # Display results
-    print(f"Scientific names with no associated common names: {len(no_common_names)}")
-    print(f"Scientific names with multiple associated common names: {len(multiple_common_names)}")
-    print(f"Scientific names with a single associated common name: {len(single_common_names)}")
+    # Display results if print_info is True
+    if print_info:
+        print(f"Scientific names with no associated common names: {len(no_common_names)}")
+        print(f"Scientific names with multiple associated common names: {len(multiple_common_names)}")
+        print(f"Scientific names with a single associated common name: {len(single_common_names)}")
 
     # Return results as a dictionary for further use
     return {
@@ -67,8 +72,7 @@ def process_scientific_names(df, condition=2):
         'single_common_names': single_common_names
     }
 
-
-def standardize_common_names(multiple_common_names):
+def standardize_common_names(multiple_common_names, show_ties=False):
     """
     Standardizes the common names for scientific names with multiple associated names,
     prioritizing specific, singular names over compound or list-like names.
@@ -108,7 +112,8 @@ def standardize_common_names(multiple_common_names):
         standardized_names[sci_name] = chosen_name
 
     # Print the total number of ties detected
-    print(f"Total ties: {tie_count}")
+    if show_ties:
+        print(f"Total ties: {tie_count}")
 
     return standardized_names
 
@@ -163,5 +168,7 @@ def standardize_common_names_subspecies(multiple_common_names, show_ties=False):
                 chosen_name = tied_names[0]
 
         standardized_names[sci_name] = chosen_name
-    print(f"Total ties: {tie_count}")
+    if show_ties:
+        print(f"Total ties: {tie_count}")
+
     return standardized_names
