@@ -180,13 +180,13 @@ assert not geo_df_points.isna().any().any(), "There are NaN values in geo_points
 
 # Export points GeoDataFrame
 geo_df_points.to_file("DATA/parks_points.geojson", driver="GeoJSON")
-if os.path.exists("DATA/parks_points.geojson"):
+if os.path.exists("../DATA/parks_points.geojson"):
     print("parks_points.geojson exported successfully")
 else:
     print("Error exporting parks_points.geojson")
 
 # Plot park points
-plot_geodataframe(geo_df_points, title='National Parks of Contiguous USA', output_path="Images/USParksLatLong.png")
+plot_geodataframe(geo_df_points, title='National Parks of Contiguous USA', output_path="../Images/USParksLatLong.png")
 
 ## Creating a POLYGON geometry GeoJSON file `parks_shapes.geojson`
 merged_parks = pd.merge(df, geo_df, left_on='park_code', right_on='UNIT_CODE')
@@ -201,10 +201,10 @@ assert not merged_geo_parks.isna().any().any(), "There are NaN values in geo_sha
 
 # Export shapes GeoDataFrame
 merged_geo_parks.to_file("DATA/parks_shapes.geojson", driver="GeoJSON")
-if os.path.exists("DATA/parks_shapes.geojson"):
+if os.path.exists("../DATA/parks_shapes.geojson"):
     print("parks_shapes.geojson exported successfully")
 else:
     print("Error exporting parks_shapes.geojson")
 
 # Plot park points
-plot_geodataframe(merged_geo_parks, title='National Parks of Contiguous USA', output_path="Images/USParksShapes.png")
+plot_geodataframe(merged_geo_parks, title='National Parks of Contiguous USA', output_path="../Images/USParksShapes.png")

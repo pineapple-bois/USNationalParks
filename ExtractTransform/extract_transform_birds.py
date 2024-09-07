@@ -11,7 +11,7 @@ from Functions.transformation_functions import process_scientific_names, standar
 
 # Configure logging
 logging.basicConfig(
-    filename='transformation.log',
+    filename='../transformation.log',
     filemode='a',
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -834,8 +834,8 @@ columns_order.insert(common_names_index + 1, columns_order.pop(columns_order.ind
 birds = birds[columns_order] 
 
 # Export the 'birds' DataFrame to a CSV file and pickle file
-csv_path = 'DATA/birds.csv'
-pickle_path = 'DATA/birds.pkl'
+csv_path = '../DATA/birds.csv'
+pickle_path = '../DATA/birds.pkl'
 
 try:
     # Attempt to export the DataFrame to CSV

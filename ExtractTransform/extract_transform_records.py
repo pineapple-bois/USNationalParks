@@ -7,7 +7,7 @@ import os
 
 # Configure logging
 logging.basicConfig(
-    filename='transformation.log',
+    filename='../transformation.log',
     filemode='a',
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -15,7 +15,7 @@ logging.basicConfig(
 logger = logging.getLogger()
 
 # Read in pickles data for datatype logging
-birds = pd.read_pickle('DATA/birds.pkl')
+birds = pd.read_pickle('../DATA/birds.pkl')
 
 logger.info(f"Shape of birds: {birds.shape}")
 logger.info(f"Data Types:\n{birds.dtypes}")
@@ -104,7 +104,7 @@ try:
     species.to_csv('DATA/species.csv', index=False)
 
     # Confirm successful exports
-    if os.path.exists('DATA/records.csv') and os.path.exists('DATA/species.csv'):
+    if os.path.exists('../DATA/records.csv') and os.path.exists('../DATA/species.csv'):
         logger.info("birds_transform.csv and species.csv exported successfully.")
     else:
         raise Exception("Export failed: One or both files were not created successfully.")
