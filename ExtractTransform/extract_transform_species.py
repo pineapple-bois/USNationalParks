@@ -158,7 +158,7 @@ class ExtractSpecies:
             backup_file_path = os.path.join(backup_dir, "incorrect_records.csv")
 
             # Save the incorrect records to CSV
-            non_standard_status_records.to_csv(backup_file_path, index=False)
+            non_standard_status_records.to_csv(backup_file_path, index=True)
 
             # Check if the file was created and log success
             if os.path.exists(backup_file_path):
