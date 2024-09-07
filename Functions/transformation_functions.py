@@ -104,6 +104,8 @@ def standardize_common_names(multiple_common_names, show_ties=False):
                 tied_names,
                 key=lambda x: (x.count(',') + x.count('/') + len(x.split()), len(x), x)
             )
+            if show_ties:
+                print(f"Tie detected for '{sci_name}': {tied_names} with count {highest_count}")
         else:
             # If no tie, use the most common name
             chosen_name = tied_names[0]
