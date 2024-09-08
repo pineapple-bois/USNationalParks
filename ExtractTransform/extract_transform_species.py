@@ -187,23 +187,23 @@ class ExtractSpecies:
         df = self.dataframe.copy()
         columns = ['scientific_name', 'common_names']
 
-        # Apply the function column-wise to check for non-standard characters in each column
-        columns_with_issues = []
-        for column in columns:
-            if df[column].apply(self.has_non_standard_chars).any():
-                columns_with_issues.append(column)
+        # Identify columns that have non-standard characters
+        columns_with_issues = [column for column in columns if df[column].apply(self.has_non_standard_chars).any()]
 
         # Filter rows where any of the columns have non-standard characters
         df_with_non_standard_chars = df[df[columns_with_issues].apply(
             lambda row: row.apply(self.has_non_standard_chars).any(), axis=1)].copy()
+
         df_to_save = df_with_non_standard_chars[['category', 'scientific_name', 'common_names']]
         self.logger.info(f"Found {len(df_to_save)} records with non-standard characters.")
         self.save_dataframe_to_csv(df_to_save, "BackupData", "nonstandard_chars.csv")
 
-        # Apply the cleaning function in place
+        # Clean the non-standard characters in place in the copy
         for column in columns_with_issues:
             df_with_non_standard_chars[column] = df_with_non_standard_chars[column].apply(
                 self.clean_non_standard_chars)
+
+        df.update(df_with_non_standard_chars)
         self.dataframe = df
         return df
 
