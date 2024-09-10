@@ -17,7 +17,7 @@ class DataFrameUtils:
 
             # Check if the file was created and log success
             if os.path.exists(backup_file_path):
-                logger.info(f"Data successfully saved to {backup_file_path}")
+                logger.info(f"Data successfully saved to {backup_file_path}\n")
             else:
                 raise FileNotFoundError(f"File {backup_file_path} was not found after saving.")
 
@@ -268,7 +268,7 @@ class DataFrameTransformation:
         return standardized_names
 
     @staticmethod
-    def identify_records(dataframe, condition, column_name, logger):
+    def identify_records(dataframe, condition, column_name, logger, category):
         """
         Identifies records based on a condition and logs the results.
 
@@ -277,20 +277,29 @@ class DataFrameTransformation:
             condition (int): The condition type to filter records.
             column_name (str): Column name to identify the records.
             logger: Logger object for logging.
+            category (str): The category of the records (e.g., 'Bird', 'Mammal').
 
         Returns:
-            pd.DataFrame: A DataFrame of identified records.
+            tuple: A DataFrame of identified records and the list of identified names.
         """
         results = DataFrameTransformation.process_scientific_names(dataframe, condition=condition)
         identified_names = results[column_name]
         identified_records = dataframe[dataframe['scientific_name'].isin(identified_names)]
-        logger.info(f"Found {len(identified_names)} records for condition {condition}.")
-        DataFrameUtils.save_dataframe_to_csv(identified_records, f"BackupData/Bird",
-                                             f"{column_name}_records.csv", logger)
+        logger.info(f"Found {len(identified_records)} records for condition {condition}.")
+
+        # Only log saving if the dataframe isn't empty
+        if not identified_records.empty:
+            DataFrameUtils.save_dataframe_to_csv(
+                identified_records,
+                f"BackupData/{category}",
+                f"{column_name}_records.csv",
+                logger
+            )
+
         return identified_records, identified_names
 
     @staticmethod
-    def fuzzy_match_and_update(dataframe, sci_names, update_field, logger):
+    def fuzzy_match_and_update(dataframe, sci_names, update_field, logger, category, identifier=None):
         """
         Performs fuzzy matching and updates the DataFrame based on matches.
 
@@ -299,6 +308,8 @@ class DataFrameTransformation:
             sci_names (list): List of scientific names to match.
             update_field (str): Field to update ('common_names' or 'scientific_name').
             logger: Logger object for logging.
+            category (str): The category of the records (e.g., 'Bird', 'Mammal').
+            identifier (any): Postfix value for filename
 
         Returns:
             pd.DataFrame: Updated DataFrame.
@@ -316,16 +327,25 @@ class DataFrameTransformation:
             dataframe.loc[dataframe['scientific_name'] == sci_name, update_field] = most_common_name
             updated_names.add(sci_name)
 
-        logger.info(f"Matched and updated {len(updated_names)} records.")
+        logger.info(f"Matched & updated {len(matches)} common_names")
+
         # Drop records that were not updated
         records_to_drop = dataframe[
-            dataframe['scientific_name'].isin(sci_names) & ~dataframe['scientific_name'].isin(updated_names)]
-        logger.info(f"Dropping {len(records_to_drop)} records that were not updated.\n")
-        dataframe = dataframe.drop(records_to_drop.index)
-        return dataframe
+            dataframe['scientific_name'].isin(sci_names) & ~dataframe['scientific_name'].isin(updated_names)
+            ]
+        if not records_to_drop.empty:
+            logger.info(f"Dropping {len(records_to_drop)} records that were not updated.")
+            filename = f"unmatched_records_{identifier}.csv"  # Unique filename
+            DataFrameUtils.save_dataframe_to_csv(
+                records_to_drop,
+                f"BackupData/{category}",
+                filename,
+                logger
+            )
+        return dataframe.drop(records_to_drop.index)
 
     @staticmethod
-    def standardize_names(dataframe, multiple_common_names, standardize_method, logger):
+    def standardize_names(dataframe, multiple_common_names, standardize_method, logger, category, condition):
         """
         Standardizes common names for scientific names with multiple common names.
 
@@ -334,19 +354,47 @@ class DataFrameTransformation:
             multiple_common_names (list): List of tuples with scientific names and their common names counts.
             standardize_method (function): Function to standardize names.
             logger: Logger object for logging.
+            category (str): The category of the records (e.g., 'Bird', 'Mammal').
 
         Returns:
             pd.DataFrame: Updated DataFrame.
         """
         standardized_name_mapping = standardize_method(multiple_common_names)
-        logger.info(f"Found {len(standardized_name_mapping)} scientific names with multiple common names.")
+        logger.info(f"Standardizing {len(standardized_name_mapping)} scientific names with multiple common names.")
 
         multi_sci_names_list = [sci_name for sci_name, counts in multiple_common_names]
         multi_common_names_records = dataframe[dataframe['scientific_name'].isin(multi_sci_names_list)]
-        DataFrameUtils.save_dataframe_to_csv(multi_common_names_records, f"BackupData/Bird",
-                                             "multi_common_names_ambiguities.csv", logger)
-        logger.info(f"{multi_common_names_records.shape[0]} records updated.\n")
+        if not multi_common_names_records.empty:
+            DataFrameUtils.save_dataframe_to_csv(
+                multi_common_names_records,
+                f"BackupData/{category}",
+                "multi_common_names_ambiguities.csv",
+                logger
+            )
 
+        updated_sci_names = set()
         for sci_name, common_name in standardized_name_mapping.items():
             dataframe.loc[dataframe['scientific_name'] == sci_name, 'common_names'] = common_name
+            updated_sci_names.add(sci_name)
+
+        # Conditional dropping: apply if condition == 3 (subspecies)
+        if condition == 3:
+            # Identify and drop records that were not updated
+            records_to_drop = dataframe[
+                dataframe['scientific_name'].isin(multi_sci_names_list) & ~dataframe['scientific_name'].isin(
+                    updated_sci_names)
+                ]
+
+            if not records_to_drop.empty:
+                drop_count = len(records_to_drop)
+                logger.info(f"Dropping {drop_count} subspecies records that were not updated.")
+                filename = f"unstandardized_subspecies_records.csv"
+                DataFrameUtils.save_dataframe_to_csv(
+                    records_to_drop,
+                    f"BackupData/{category}",
+                    filename,
+                    logger
+                )
+                dataframe = dataframe.drop(records_to_drop.index)
+
         return dataframe
