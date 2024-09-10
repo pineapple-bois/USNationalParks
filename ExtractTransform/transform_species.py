@@ -1,12 +1,30 @@
 import pandas as pd
+import yaml
 from abc import ABC, abstractmethod
+from collections import Counter
 from utils import DataFrameUtils, DataFrameTransformation
 from extract_species import ExtractSpecies
+
 
 # Add to below as required as and when abstract base methods written
 VALID_CATEGORIES = [
     'Mammal', 'Bird', 'Reptile', 'Amphibian', 'Fish'
 ]
+
+
+def load_manual_choices(filepath="config/manual_choices.yaml"):
+    with open(filepath, "r") as file:
+        return yaml.safe_load(file).get("manual_choices", {})
+
+
+def load_yaml_subspecies_config(filepath):
+    with open(filepath, 'r') as file:
+        return yaml.safe_load(file)
+
+
+def load_manual_verification(filepath='config/manual_verification.yaml'):
+    with open(filepath, "r") as file:
+        return yaml.safe_load(file).get("manual_choices", {})
 
 
 class TransformSpecies:
@@ -99,6 +117,7 @@ class TransformSpecies:
 
         df_copy.drop(df_to_save.index, inplace=True)
         self.dataframe = df_copy
+
         return self.dataframe
 
     def _process_no_common_names(self, condition):
@@ -116,6 +135,7 @@ class TransformSpecies:
             self.dataframe, no_common_names, 'common_names', self.logger, self.category, identifier=condition
         )
         self.records_dropped += original_count - len(self.dataframe)  # Update records dropped counter
+
         return self.dataframe
 
     def _process_multiple_common_names(self, condition):
@@ -137,6 +157,7 @@ class TransformSpecies:
             self.dataframe, multiple_common_names, standardize_method, self.logger, self.category, condition
         )
         self.records_dropped += original_count - len(self.dataframe)  # Update records dropped counter
+
         return self.dataframe
 
     def _process_subspecies(self):
@@ -148,6 +169,7 @@ class TransformSpecies:
         self.dataframe = self._process_no_common_names(condition=3)
         # Process subspecies with multiple common names
         self.dataframe = self._process_multiple_common_names(condition=3)
+
         return self.dataframe
 
     def _update_records_nan_common_names(self):
@@ -180,7 +202,207 @@ class TransformSpecies:
         self.logger.info(f"Dropping {len(records_to_drop)} records that were not updated.\n")
         self.records_dropped += len(records_to_drop)
         self.dataframe = self.dataframe.drop(records_to_drop.index)
+
         return self.dataframe
+
+    def _update_comma_sep_common_names(self):
+        sci_name_set = self.dataframe['scientific_name'].unique()
+        common_name_mapping, scientific_name_mapping = DataFrameTransformation.process_comma_separated_names(
+            self.dataframe, sci_name_set, match_score=90
+        )
+        self.logger.info(f"Common Mapping: {common_name_mapping}")
+        self.logger.info(f"Sci Mapping: {scientific_name_mapping}")
+
+        # Define a helper to update rows based on the mappings
+        updated_indices = set()
+        def update_row(row):
+            sci_name = row['scientific_name']
+            if sci_name in common_name_mapping or sci_name in scientific_name_mapping:
+                updated_indices.add(row.name)
+                return (
+                    common_name_mapping.get(sci_name, row['common_names']),
+                    scientific_name_mapping.get(sci_name, sci_name)
+                )
+            return row['common_names'], row['scientific_name']
+
+        self.dataframe[['common_names', 'scientific_name']] = self.dataframe.apply(
+            lambda row: pd.Series(update_row(row)), axis=1)
+
+        return self.dataframe
+
+    def _resolve_sci_name_ambiguities(self):
+        """
+        Resolves common name ambiguities by identifying potential typos or ambiguities in common names
+        linked to 'Genus species' scientific names, and updates the DataFrame accordingly.
+        This method is designed to be generic but can include category-specific mappings or exceptions.
+        """
+        potential_issues_df = DataFrameTransformation.identify_sci_name_ambiguities(
+                            self.dataframe, self.logger, self.category
+        )
+        selected_sci_names, ties_for_review = DataFrameTransformation.select_scientific_names_by_common_name(
+            potential_issues_df)
+        self.logger.info(f"Selected scientific names for {len(selected_sci_names)} common names based on highest counts.")
+
+        # Log ties for manual review
+        if ties_for_review:
+            self.logger.info(f"Found {len(ties_for_review)} common names with ties requiring manual review.")
+            DataFrameUtils.save_dataframe_to_csv(
+                pd.DataFrame(ties_for_review),
+                f"BackupData/{self.category}",
+                "ties_for_review.csv",
+                self.logger
+            )
+
+        # Apply manual choices from configuration
+        manual_choices = load_manual_choices()
+        category_manual_choices = manual_choices.get(self.category, {})
+        selected_sci_names.update(category_manual_choices)
+
+        # Update the scientific names in the DataFrame
+        original_count = len(self.dataframe)
+        self.dataframe = DataFrameTransformation.update_scientific_names(self.dataframe, selected_sci_names)
+        updated_indices = self.dataframe.index[self.dataframe['scientific_name'].isin(selected_sci_names.values())]
+        updated_records_df = self.dataframe.loc[updated_indices]
+        updated_count = len(updated_records_df)
+
+        if updated_count > 0:
+            self.logger.info(f"Updated {updated_count} records with new scientific names.")
+            DataFrameUtils.save_dataframe_to_csv(
+                updated_records_df,
+                f"BackupData/{self.category}",
+                "updated_scientific_names.csv",
+                self.logger
+            )
+        else:
+            self.logger.info("No records updated with new scientific names.")
+
+        self.records_dropped += (original_count - len(self.dataframe))
+
+        return self.dataframe
+
+    def _standardize_subspecies_common_names(self):
+        """
+        Standardizes the common names for subspecies in the DataFrame by mapping them to their
+        corresponding genus-species common names, appending subspecies information where applicable.
+        """
+        config = load_yaml_subspecies_config('config/subspecies_config.yaml')
+
+        subspecies_df = DataFrameTransformation.identify_subspecies(self.dataframe)
+        subspecies_df = DataFrameTransformation.map_genus_species_to_common_names(self.dataframe, subspecies_df)
+        updated_subspecies_df = DataFrameTransformation.filter_and_standardize_subspecies_names(
+            subspecies_df, self.category, config
+        )
+
+        filtered_indices = updated_subspecies_df.index
+        self.dataframe.loc[filtered_indices, 'common_names'] = updated_subspecies_df['common_names']
+
+        DataFrameUtils.save_dataframe_to_csv(
+            self.dataframe.loc[filtered_indices],
+            f"BackupData/{self.category}",
+            "subspecies_common_name_to_norm.csv",
+            self.logger
+        )
+        self.logger.info(f"Processed and updated {len(updated_subspecies_df)} subspecies common names.\n")
+
+        return self.dataframe
+
+    def _update_common_names_with_subspecies(self):
+        """
+        Identifies common names associated with multiple scientific names and updates
+        them with subspecies information as specified in the configuration.
+        """
+        # Identify common names associated with multiple scientific names
+        common_name_sci_count = self.dataframe.groupby('common_names')['scientific_name'].nunique()
+        multi_sci_common_names = common_name_sci_count[common_name_sci_count > 1]
+
+        # Log the counts of scientific names per common name
+        self.logger.info(f"Common names with multiple associated scientific names:\n{multi_sci_common_names}\n\n")
+
+        # Load updates from the configuration
+        manual_choices = load_manual_verification()  # Load the entire manual verification config
+        category_updates = manual_choices.get(self.category, {}).get('updates', {})
+        for sci_name, new_common_name in category_updates.items():
+            self.dataframe.loc[self.dataframe['scientific_name'] == sci_name, 'common_names'] = new_common_name
+
+        return self.dataframe
+
+    def _update_missing_family(self):
+        """
+        Attempts to fill missing 'family' values by matching 'order' and 'scientific_name'.
+        Saves the records with NaN in the 'family' column before and after the update.
+        """
+        # Filter records with NaN in the 'family' column
+        nan_family_records = self.dataframe[self.dataframe['family'].isna()]
+        self.logger.info(f"Found {len(nan_family_records)} records with missing 'family' values.")
+
+        # Save the initial records with NaN family values for reference
+        if not nan_family_records.empty:
+            DataFrameUtils.save_dataframe_to_csv(
+                nan_family_records,
+                f"BackupData/{self.category}",
+                "nan_family_records_before_update.csv",
+                self.logger
+            )
+
+        # Create a dictionary of known families indexed by 'order' and 'scientific_name'
+        known_families = self.dataframe.dropna(subset=['family']).set_index(['order', 'scientific_name'])[
+            'family'].to_dict()
+
+        # Attempt to fill missing 'family' values by matching 'order' and 'scientific_name'
+        updated_count = 0
+        for index, row in nan_family_records.iterrows():
+            order = row['order']
+            scientific_name = row['scientific_name']
+            family = known_families.get((order, scientific_name))
+            if family:
+                self.dataframe.at[index, 'family'] = family
+                updated_count += 1
+        self.logger.info(f"Updated {updated_count} records with missing 'family' values.\n")
+
+        return self.dataframe
+
+    def verify_dataset_integrity(self):
+        """
+        Verifies the integrity of the dataset by checking for NaN values,
+        dropping duplicates, and ensuring the count of unique scientific names
+        matches the count of unique records. Logs the results of these checks.
+
+        Returns:
+            bool: True if integrity checks pass, otherwise raises an exception or
+                  returns a DataFrame of discrepancies for manual update.
+        """
+        # Check for NaN values in the dataframe
+        if self.dataframe.isna().any().any():
+            nan_counts = self.dataframe.isna().sum()
+            nan_fields = nan_counts[nan_counts > 0].index.tolist()
+            self.logger.error(f"Integrity check failed: Found NaN values in fields: {nan_fields}")
+            raise ValueError("Dataset contains NaN values. Please address missing data before proceeding.")
+
+        # Drop duplicates and count unique records
+        species = self.dataframe[['order', 'family', 'scientific_name', 'common_names']]
+        species = species.drop_duplicates()
+        unique_records_count = species.shape[0]
+        self.logger.info(f"Unique records after dropping duplicates: {unique_records_count}")
+
+        # Count unique scientific names
+        unique_sci_names_count = species['scientific_name'].nunique()
+        self.logger.info(f"Unique scientific names: {unique_sci_names_count}")
+
+        # Compare the counts
+        if unique_sci_names_count != unique_records_count:
+            self.logger.error(
+                f"Integrity check failed: Mismatch between unique scientific names ({unique_sci_names_count}) "
+                f"and unique records ({unique_records_count})."
+            )
+
+            # Find discrepancies for manual review
+            discrepancies = species.groupby('scientific_name').filter(lambda x: len(x) > 1)
+            self.logger.info("Returning discrepancies for manual update.")
+            return discrepancies
+
+        # Log success if all checks pass
+        self.logger.info("Dataset integrity verified: No NaN values and counts match.\n")
+        return True  # Indicating the integrity check passed
 
     def _apply_category_transformations(self):
         """Applies the appropriate transformation strategy based on the category."""
@@ -193,6 +415,16 @@ class TransformSpecies:
         self.dataframe = self._process_subspecies()
         self.logger.info(f"Processing Records where 'common_names' is NaN:")
         self.dataframe = self._update_records_nan_common_names()
+        self.logger.info(f"Remapping comma separated 'common_names':")
+        self.dataframe = self._update_comma_sep_common_names()
+        self.logger.info(f"Resolving Genus species ambiguities:")
+        self.dataframe = self._resolve_sci_name_ambiguities()
+        self.logger.info(f"Resolving subspecies ambiguities:")
+        self.dataframe = self._standardize_subspecies_common_names()
+        self.logger.info(f"Resolving scientific_name ambiguities:")
+        self.dataframe = self._update_common_names_with_subspecies()
+        self.logger.info(f"Resolving missing family fields:")
+        self.dataframe = self._update_missing_family()
 
         # Apply extra methods base on strategy
         strategy = TransformStrategyFactory.get_strategy(self.category)
@@ -236,7 +468,7 @@ class BirdTransformStrategy(TransformStrategy):
     Transformation strategy for Bird category.
     """
     def apply_transformations(self, dataframe: pd.DataFrame, logger) -> pd.DataFrame:
-        logger.info("Applying bird-specific transformations:\n")
+        logger.info("APPLYING BIRD SPECIFIC TRANSFORMATIONS:\n")
         # Add bird-specific transformations here
         return dataframe
 

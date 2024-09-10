@@ -398,3 +398,173 @@ class DataFrameTransformation:
                 dataframe = dataframe.drop(records_to_drop.index)
 
         return dataframe
+
+
+    @staticmethod
+    def process_comma_separated_names(dataframe, all_sci_names, match_score=90):
+        """
+        Processes scientific names with comma-separated common names to identify potential typos or ambiguous names
+        and returns mappings for scientific and common names.
+
+        Args:
+            dataframe (pd.DataFrame): The input DataFrame.
+            all_sci_names (list): List of all scientific names for fuzzy matching.
+            match_score (int): Threshold for fuzzy match score to consider a match.
+
+        Returns:
+            tuple: Two dictionaries mapping scientific names to standardized common names
+                   and common names to the most appropriate scientific name.
+        """
+        two_word_sci_names = dataframe[dataframe['scientific_name'].str.split().str.len() == 2]
+        comma_separated_common_names = two_word_sci_names[
+            two_word_sci_names['common_names'].str.contains(',', na=False)]
+        subset_sci_names = comma_separated_common_names['scientific_name'].unique()
+        potential_matches = {}
+
+        for sci_name in subset_sci_names:
+            genus_species = ' '.join(sci_name.split()[:2])
+            matches = process.extract(genus_species, all_sci_names, scorer=fuzz.ratio, limit=5)
+            high_quality_matches = [match for match in matches if match[1] > match_score]
+
+            if high_quality_matches:
+                matched_sci_names = [match[0] for match in high_quality_matches]
+                common_names = dataframe[dataframe['scientific_name'].isin(matched_sci_names)]['common_names'].dropna()
+                common_names_counter = Counter(common_names)
+
+                if len(common_names_counter) > 1:
+                    most_common_name = common_names_counter.most_common(1)
+                    potential_matches[sci_name] = {
+                        'matches': high_quality_matches,
+                        'most_common_name': most_common_name[0][0] if most_common_name else 'No common name found',
+                        'common_name_counts': common_names_counter
+                    }
+
+        # Extract the mappings needed
+        common_name_mapping = {sci_name: info['most_common_name'] for sci_name, info in potential_matches.items()}
+        scientific_name_mapping = {sci_name: info['matches'][1][0] for sci_name, info in potential_matches.items()}
+        return common_name_mapping, scientific_name_mapping
+
+
+    @staticmethod
+    def identify_sci_name_ambiguities(dataframe, logger, category):
+        """Identify potential typos or ambiguities in common names linked to 'Genus species' scientific names."""
+        common_name_to_sci_names = {}
+        two_word_sci_names = dataframe[dataframe['scientific_name'].str.split().apply(len) == 2]
+
+        for common_name in two_word_sci_names['common_names'].unique():
+            associated_sci_names = two_word_sci_names[two_word_sci_names['common_names'] == common_name][
+                'scientific_name']
+            sci_name_counts = Counter(associated_sci_names)
+            common_name_to_sci_names[common_name] = sci_name_counts
+
+        potential_issues = {
+            common_name: sci_name_counts
+            for common_name, sci_name_counts in common_name_to_sci_names.items()
+            if len(sci_name_counts) > 1
+        }
+
+        potential_issues_df = pd.DataFrame([
+            {'common_names': common_name,
+             'scientific_name': sci_name,
+             'record_count': count
+             }
+            for common_name, sci_name_counts in potential_issues.items()
+            for sci_name, count in sci_name_counts.items()
+        ])
+        if not potential_issues_df.empty:
+            logger.info(f"Identified {len(potential_issues_df)} potential ambiguities in common names.")
+            DataFrameUtils.save_dataframe_to_csv(
+                potential_issues_df,
+                f"BackupData/{category}",
+                "scientific_name_ambiguities.csv",
+                logger
+            )
+        else:
+            logger.info("No ambiguities found in common names.")
+
+        return potential_issues_df
+
+
+    @staticmethod
+    def select_scientific_names_by_common_name(potential_issues_df):
+        """Selects scientific names based on highest count and flags ties for review."""
+        selected_sci_names = {}
+        ties_for_review = {}
+
+        for common_name, group in potential_issues_df.groupby('common_names'):
+            max_count = group['record_count'].max()
+            max_count_names = group[group['record_count'] == max_count]
+
+            if len(max_count_names) > 1:
+                ties_for_review[common_name] = max_count_names[['scientific_name', 'record_count']].to_dict(
+                    orient='records')
+            else:
+                chosen_name = max_count_names.iloc[0]['scientific_name']
+                selected_sci_names[common_name] = chosen_name
+
+        return selected_sci_names, ties_for_review
+
+
+    @staticmethod
+    def update_scientific_names(dataframe, selected_sci_names):
+        """Updates the scientific names in the birds DataFrame based on selected mappings."""
+        selected_sci_names_mapping = {common_name: sci_name for common_name, sci_name in selected_sci_names.items()}
+
+        dataframe['scientific_name'] = dataframe.apply(
+            lambda row: selected_sci_names_mapping.get(row['common_names'], row['scientific_name'])
+            if len(row['scientific_name'].split()) == 2 else row['scientific_name'],
+            axis=1
+        )
+        return dataframe
+
+
+    @staticmethod
+    def identify_subspecies(dataframe):
+        """
+        Identifies records in the DataFrame with scientific names of the form 'Genus species subspecies'.
+        """
+        three_word_sci_names = dataframe[dataframe['scientific_name'].str.split().str.len() >= 3].copy()
+        three_word_sci_names['genus_species'] = three_word_sci_names['scientific_name'].apply(
+            lambda x: ' '.join(x.split()[:2]))
+        return three_word_sci_names
+
+
+    @staticmethod
+    def map_genus_species_to_common_names(full_dataframe, subspecies_df):
+        """
+        Maps genus_species to common names using the genus-species records from the full DataFrame.
+        """
+        two_word_sci_names = full_dataframe[full_dataframe['scientific_name'].str.split().str.len() == 2]
+        genus_species_to_common_name = two_word_sci_names.set_index('scientific_name')['common_names'].to_dict()
+        subspecies_df['matched_common_name'] = subspecies_df['genus_species'].map(genus_species_to_common_name)
+        return subspecies_df
+
+
+    @staticmethod
+    def standardize_common_names_helper(row):
+        """
+        Standardizes the common name for a subspecies row by appending the subspecies information.
+        """
+        subspecies = row['scientific_name'].split()[-1]
+        if '(' not in row['common_names']:
+            return f"{row['matched_common_name']} ({subspecies} subspecies)"
+        return row['common_names']
+
+
+    @staticmethod
+    def filter_and_standardize_subspecies_names(subspecies_df, category, config):
+        """
+        Filters and standardizes subspecies common names based on configuration from a YAML file.
+        """
+        # Load exclusions and columns to drop from the config
+        common_names_to_exclude = config.get('common_names_to_exclude', {}).get(category, [])
+        columns_to_exclude = config.get('columns_to_exclude', {}).get('default', [])
+
+        subspecies_df = subspecies_df[~subspecies_df['matched_common_name'].isin(common_names_to_exclude)]
+        subspecies_df = subspecies_df.drop(columns=columns_to_exclude, errors='ignore')
+        subspecies_df = subspecies_df.dropna(subset=['matched_common_name'])
+
+        subspecies_df['common_names'] = subspecies_df.apply(DataFrameTransformation.standardize_common_names_helper, axis=1)
+
+        return subspecies_df
+
