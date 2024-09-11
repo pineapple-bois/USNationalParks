@@ -1,30 +1,18 @@
 import pandas as pd
 import yaml
-from abc import ABC, abstractmethod
 from collections import Counter
-from utils import DataFrameUtils, DataFrameTransformation
-from extract_species import ExtractSpecies
+
+from ExtractTransform.utils.dataframe_utils import DataFrameUtils
+from ExtractTransform.utils.dataframe_transformation import DataFrameTransformation
+from ExtractTransform.extract_species import ExtractSpecies
+from ExtractTransform.transform_category_abstract import (TransformStrategy, TransformStrategyFactory,
+                                         BirdTransformStrategy, MammalTransformStrategy)
 
 
-# Add to below as required as and when abstract base methods written
+# Add to below as required as and when abstract base methods written and testing completed
 VALID_CATEGORIES = [
     'Mammal', 'Bird', 'Reptile', 'Amphibian', 'Fish'
 ]
-
-
-def load_manual_choices(filepath="config/manual_choices.yaml"):
-    with open(filepath, "r") as file:
-        return yaml.safe_load(file).get("manual_choices", {})
-
-
-def load_yaml_subspecies_config(filepath):
-    with open(filepath, 'r') as file:
-        return yaml.safe_load(file)
-
-
-def load_manual_verification(filepath='config/manual_verification.yaml'):
-    with open(filepath, "r") as file:
-        return yaml.safe_load(file).get("manual_choices", {})
 
 
 class TransformSpecies:
@@ -94,6 +82,12 @@ class TransformSpecies:
             raise
 
         self.logger.info(f"DataFrame created for category '{self.category}' with shape: {self.dataframe.shape}")
+        self.logger.info(f"Records dropped during creation: {self.records_dropped}")
+        DataFrameUtils.pickle_data(self.dataframe,
+                                   f'FinalData',
+                                   f'{formatted_category}.pkl',
+                                   self.logger
+                                   )
 
     def _subset_category(self):
         """Filters the transformed DataFrame to include only the specified category."""
@@ -207,9 +201,28 @@ class TransformSpecies:
 
     def _update_comma_sep_common_names(self):
         sci_name_set = self.dataframe['scientific_name'].unique()
-        common_name_mapping, scientific_name_mapping = DataFrameTransformation.process_comma_separated_names(
+        potential_matches = DataFrameTransformation.process_comma_separated_names(
             self.dataframe, sci_name_set, match_score=90
         )
+        # Create a readable version for YAML saving
+        readable_potential_matches = {
+            sci_name: {
+                'matches': [{'match': match[0], 'score': match[1]} for match in info['matches']],
+                'most_common_name': info['most_common_name'],
+                'common_name_counts': dict(info['common_name_counts'])
+            }
+            for sci_name, info in potential_matches.items()
+        }
+
+        # Save to YAML for review using the readable version
+        DataFrameUtils.save_dict_to_yaml(
+            readable_potential_matches,
+            f'BackupData/{self.category}/Reviews',
+            'process_comma_separated_names.yaml',
+            self.logger
+        )
+        common_name_mapping = {sci_name: info['most_common_name'] for sci_name, info in potential_matches.items()}
+        scientific_name_mapping = {sci_name: info['matches'][1][0] for sci_name, info in potential_matches.items()}
         self.logger.info(f"Common Mapping: {common_name_mapping}")
         self.logger.info(f"Sci Mapping: {scientific_name_mapping}")
 
@@ -242,21 +255,27 @@ class TransformSpecies:
         selected_sci_names, ties_for_review = DataFrameTransformation.select_scientific_names_by_common_name(
             potential_issues_df)
         self.logger.info(f"Selected scientific names for {len(selected_sci_names)} common names based on highest counts.")
+        DataFrameUtils.save_dict_to_yaml(selected_sci_names,
+                                         f'BackupData/{self.category}/Reviews',
+                                         'resolve_sci_name_ambiguities_selected.yaml',
+                                         self.logger)
 
-        # Log ties for manual review
         if ties_for_review:
             self.logger.info(f"Found {len(ties_for_review)} common names with ties requiring manual review.")
-            DataFrameUtils.save_dataframe_to_csv(
-                pd.DataFrame(ties_for_review),
-                f"BackupData/{self.category}",
-                "ties_for_review.csv",
-                self.logger
-            )
+            # Save to YAML for review
+            DataFrameUtils.save_dict_to_yaml(ties_for_review,
+                                             f'BackupData/{self.category}/Reviews',
+                                             'resolve_sci_name_ambiguities_ties.yaml',
+                                             self.logger)
 
         # Apply manual choices from configuration
-        manual_choices = load_manual_choices()
-        category_manual_choices = manual_choices.get(self.category, {})
-        selected_sci_names.update(category_manual_choices)
+        manual_choices = DataFrameUtils.load_dict_from_yaml("config/manual_choices.yaml")
+        category_manual_choices = manual_choices.get("manual_choices", {}).get(self.category, {})
+        if not category_manual_choices:
+            self.logger.info(
+                f"No manual choices found for category '{self.category}'. Proceeding without applying manual updates.")
+        else:
+            selected_sci_names.update(category_manual_choices)
 
         # Update the scientific names in the DataFrame
         original_count = len(self.dataframe)
@@ -267,15 +286,8 @@ class TransformSpecies:
 
         if updated_count > 0:
             self.logger.info(f"Updated {updated_count} records with new scientific names.")
-            DataFrameUtils.save_dataframe_to_csv(
-                updated_records_df,
-                f"BackupData/{self.category}",
-                "updated_scientific_names.csv",
-                self.logger
-            )
         else:
             self.logger.info("No records updated with new scientific names.")
-
         self.records_dropped += (original_count - len(self.dataframe))
 
         return self.dataframe
@@ -285,7 +297,7 @@ class TransformSpecies:
         Standardizes the common names for subspecies in the DataFrame by mapping them to their
         corresponding genus-species common names, appending subspecies information where applicable.
         """
-        config = load_yaml_subspecies_config('config/subspecies_config.yaml')
+        config = DataFrameUtils.load_dict_from_yaml('config/subspecies_config.yaml')
 
         subspecies_df = DataFrameTransformation.identify_subspecies(self.dataframe)
         subspecies_df = DataFrameTransformation.map_genus_species_to_common_names(self.dataframe, subspecies_df)
@@ -295,13 +307,6 @@ class TransformSpecies:
 
         filtered_indices = updated_subspecies_df.index
         self.dataframe.loc[filtered_indices, 'common_names'] = updated_subspecies_df['common_names']
-
-        DataFrameUtils.save_dataframe_to_csv(
-            self.dataframe.loc[filtered_indices],
-            f"BackupData/{self.category}",
-            "subspecies_common_name_to_norm.csv",
-            self.logger
-        )
         self.logger.info(f"Processed and updated {len(updated_subspecies_df)} subspecies common names.\n")
 
         return self.dataframe
@@ -314,15 +319,33 @@ class TransformSpecies:
         # Identify common names associated with multiple scientific names
         common_name_sci_count = self.dataframe.groupby('common_names')['scientific_name'].nunique()
         multi_sci_common_names = common_name_sci_count[common_name_sci_count > 1]
+        multi_sci_common_names_list = multi_sci_common_names.index.tolist()
+        multi_sci_common_name_records = self.dataframe[self.dataframe['common_names'].isin(multi_sci_common_names_list)]
 
-        # Log the counts of scientific names per common name
-        self.logger.info(f"Common names with multiple associated scientific names:\n{multi_sci_common_names}\n\n")
+        common_name_to_sci_names_counts = {}
+        for common_name, group in multi_sci_common_name_records.groupby('common_names'):
+            sci_names_counts = Counter(group['scientific_name'])
+            common_name_to_sci_names_counts[common_name] = dict(sci_names_counts)
+
+        DataFrameUtils.save_dict_to_yaml(common_name_to_sci_names_counts,
+                                         f'BackupData/{self.category}/Reviews',
+                                         'update_common_names_with_subspecies.yaml',
+                                         self.logger)
 
         # Load updates from the configuration
-        manual_choices = load_manual_verification()  # Load the entire manual verification config
-        category_updates = manual_choices.get(self.category, {}).get('updates', {})
-        for sci_name, new_common_name in category_updates.items():
-            self.dataframe.loc[self.dataframe['scientific_name'] == sci_name, 'common_names'] = new_common_name
+        manual_choices = DataFrameUtils.load_dict_from_yaml('config/manual_verification.yaml')
+        category_updates = manual_choices.get("manual_choices", {}).get(self.category, {}).get('updates', {})
+        # Check if there are any updates for the current category
+        if not category_updates:
+            self.logger.info(f"No specific updates found for category '{self.category}'. Skipping manual updates.")
+        else:
+            for sci_name, new_common_name in category_updates.items():
+                self.dataframe.loc[self.dataframe['scientific_name'] == sci_name, 'common_names'] = new_common_name
+            self.logger.info(f"Applied {len(category_updates)} manual updates.")
+
+        common_name_sci_count = self.dataframe.groupby('common_names')['scientific_name'].nunique()
+        multi_sci_common_names = common_name_sci_count[common_name_sci_count > 1]
+        self.logger.info(f"Common names with multiple associated scientific names:\n{multi_sci_common_names}\n")
 
         return self.dataframe
 
@@ -382,13 +405,8 @@ class TransformSpecies:
         species = self.dataframe[['order', 'family', 'scientific_name', 'common_names']]
         species = species.drop_duplicates()
         unique_records_count = species.shape[0]
-        self.logger.info(f"Unique records after dropping duplicates: {unique_records_count}")
-
-        # Count unique scientific names
         unique_sci_names_count = species['scientific_name'].nunique()
-        self.logger.info(f"Unique scientific names: {unique_sci_names_count}")
 
-        # Compare the counts
         if unique_sci_names_count != unique_records_count:
             self.logger.error(
                 f"Integrity check failed: Mismatch between unique scientific names ({unique_sci_names_count}) "
@@ -405,81 +423,65 @@ class TransformSpecies:
         return True  # Indicating the integrity check passed
 
     def _apply_category_transformations(self):
-        """Applies the appropriate transformation strategy based on the category."""
-        self.dataframe = self._remove_genus_only_records()
-        self.logger.info(f"Processing Records with no 'common_names':")
-        self.dataframe = self._process_no_common_names(condition=2)
-        self.logger.info(f"Processing Records with multiple 'common_names':")
-        self.dataframe = self._process_multiple_common_names(condition=2)
-        self.logger.info(f"Processing Records containing subspecies (Genus species subspecies):")
-        self.dataframe = self._process_subspecies()
-        self.logger.info(f"Processing Records where 'common_names' is NaN:")
-        self.dataframe = self._update_records_nan_common_names()
-        self.logger.info(f"Remapping comma separated 'common_names':")
-        self.dataframe = self._update_comma_sep_common_names()
-        self.logger.info(f"Resolving Genus species ambiguities:")
-        self.dataframe = self._resolve_sci_name_ambiguities()
-        self.logger.info(f"Resolving subspecies ambiguities:")
-        self.dataframe = self._standardize_subspecies_common_names()
-        self.logger.info(f"Resolving scientific_name ambiguities:")
-        self.dataframe = self._update_common_names_with_subspecies()
-        self.logger.info(f"Resolving missing family fields:")
-        self.dataframe = self._update_missing_family()
+        """
+        Applies the appropriate transformation strategy based on the category.
 
-        # Apply extra methods base on strategy
+        This method performs a series of data transformations that are initially common
+        to all categories. It then conditionally applies additional transformations specific
+        to the 'Bird' category, including handling genus-species ambiguities, subspecies
+        standardizations, and family field updates.
+
+        For other categories, such as 'Mammal', this method currently skips these specific
+        transformations but provides a framework for future expansion.
+
+        Steps to scale this method for new categories:
+        - Test each transformation step individually to ensure compatibility with the new category.
+        - Add category-specific conditional branches similar to the 'Bird' category where needed.
+        - Update the `TransformStrategyFactory` with new strategies as new categories are added.
+
+        Returns:
+            None: Updates are applied directly to the class instance's dataframe attribute.
+
+        Example:
+            To extend this method to handle 'Mammal' category, add:
+                if self.category == 'Mammal':
+                    # Insert Mammal-specific transformation methods here
+        """
+
+        # General transformations applicable to all categories
+        self.dataframe = self._remove_genus_only_records()
+        self.logger.info("Processing Records with no 'common_names':")
+        self.dataframe = self._process_no_common_names(condition=2)
+        self.logger.info("Processing Records with multiple 'common_names':")
+        self.dataframe = self._process_multiple_common_names(condition=2)
+        self.logger.info("Processing Records containing subspecies (Genus species subspecies):")
+        self.dataframe = self._process_subspecies()
+        self.logger.info("Processing Records where 'common_names' is NaN:")
+        self.dataframe = self._update_records_nan_common_names()
+
+        # Bird-specific transformations
+        if self.category == 'Bird':
+            self.logger.info("Remapping comma-separated 'common_names':")
+            self.dataframe = self._update_comma_sep_common_names()
+
+            self.logger.info("Resolving Genus species ambiguities:")
+            self.dataframe = self._resolve_sci_name_ambiguities()
+
+            self.logger.info("Resolving subspecies ambiguities:")
+            self.dataframe = self._standardize_subspecies_common_names()
+
+            self.logger.info("Resolving scientific_name ambiguities:")
+            self.dataframe = self._update_common_names_with_subspecies()
+
+            self.logger.info("Resolving missing family fields:")
+            self.dataframe = self._update_missing_family()
+
+        # To scale to other categories, each method branched above should be tested
+        # one by one with the new category to ensure compatibility and correctness.
+        if self.category == 'Mammal':
+            pass
+
+        # Apply extra methods based on specific category strategy
         strategy = TransformStrategyFactory.get_strategy(self.category)
         self.dataframe = strategy.apply_transformations(self.dataframe, self.logger)
-        self.logger.info(f"Total records dropped: {self.records_dropped}")
 
-
-# Abstract Base Class
-class TransformStrategy(ABC):
-    """
-    Abstract base class for transformation strategies for different categories.
-    """
-    @abstractmethod
-    def apply_transformations(self, dataframe: pd.DataFrame, logger) -> pd.DataFrame:
-        """Apply specific transformations to the DataFrame."""
-        return dataframe
-
-
-# Factory Class
-class TransformStrategyFactory:
-    """
-    Factory to create transformation strategies based on the category.
-    """
-    _strategies = {
-        'Bird': lambda: BirdTransformStrategy(),
-        'Mammal': lambda: MammalTransformStrategy(),
-        # Other mappings here when scaling
-    }
-
-    @staticmethod
-    def get_strategy(category: str) -> TransformStrategy:
-        try:
-            return TransformStrategyFactory._strategies[category]()
-        except KeyError:
-            raise ValueError(f"No transformation strategy defined for category: {category}")
-
-
-# Concrete Strategy for Birds
-class BirdTransformStrategy(TransformStrategy):
-    """
-    Transformation strategy for Bird category.
-    """
-    def apply_transformations(self, dataframe: pd.DataFrame, logger) -> pd.DataFrame:
-        logger.info("APPLYING BIRD SPECIFIC TRANSFORMATIONS:\n")
-        # Add bird-specific transformations here
-        return dataframe
-
-
-
-# Concrete Strategy for Mammals
-class MammalTransformStrategy(TransformStrategy):
-    """
-    Transformation strategy for Mammal category.
-    """
-    def apply_transformations(self, dataframe: pd.DataFrame, logger) -> pd.DataFrame:
-        logger.info("Applying mammal-specific transformations.\n")
-        # Add mammal-specific transformations here
-        return dataframe
