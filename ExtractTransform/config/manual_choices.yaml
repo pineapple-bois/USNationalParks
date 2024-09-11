@@ -1,0 +1,13 @@
+# Manual selections based on Backups/category/Review/resolve_sci_name_ambiguities_ties
+
+manual_choices:
+  Bird:
+    "Abert's Towhee": "Melozone aberti"
+    "Black-Footed Albatross": "Phoebastria nigripes"
+    "Far Eastern Curlew": "Numenius madagascariensis"
+    "Gray-Headed Chickadee": "Poecile cinctus"
+    "Lawrence's Warbler": "Vermivora lawrencei"
+    "Wandering Tattler": "Tringa incana"
+  #Mammal:
+
+  # Add more categories and species as needed

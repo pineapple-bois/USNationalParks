@@ -1,0 +1,31 @@
+# Common names we do not want amended in _standardize_subspecies_common_names()
+common_names_to_exclude:
+  Bird:
+    - "Mountain Pygmy Owl, Northern Pygmy-Owl"
+    - "Baltimore Oriole, Northern Oriole"
+    - "Western Gull"
+    - "Whimbrel"
+    - "Lazuli Bunting"
+    - "American Three-Toed Woodpecker"
+    - "Snail Kite"
+    - "Great Gray Owl"
+    - "Spotted Owl"
+    - "Prairie Chicken"
+    - "Golden-Winged Warbler"
+    - "Blue-Winged Warbler"
+  #Mammal:
+    #- #
+    #- #
+
+columns_to_exclude:
+  default:
+    - "park_code"
+    - "category"
+    - "order"
+    - "record_status"
+    - "occurrence"
+    - "nativeness"
+    - "abundance"
+    - "seasonality"
+    - "conservation_status"
+    - "is_protected"

@@ -1,0 +1,14 @@
+# Particular values to update in _update_common_names_with_subspecies()
+
+manual_choices:
+  Bird:
+    updates:
+      'Junco hyemalis shufeldti': "Dark-Eyed Junco (shufeldti subspecies)"
+      'Junco hyemalis thurberi': "Dark-Eyed Junco (thurberi subspecies)"
+      'Strix nebulosa nebulosa': "Great Gray Owl (nebulosa subspecies)"
+      'Falco peregrinum anatum': "Peregrine Falcon (anatum subspecies)"
+  #Mammal:
+    #updates:
+      # Add mammal-specific updates here as needed
+      # Example:
+      # 'Mammal scientific name': "Updated common name"
