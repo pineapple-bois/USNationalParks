@@ -1,85 +1,10 @@
-from abc import ABC, abstractmethod
 import pandas as pd
 import logging
 
-from ExtractTransform.utils.dataframe_utils import DataFrameUtils
+from ..utils import DataFrameUtils
+from .abstract_strategy import TransformStrategy
 
 
-# Abstract Base Class
-class TransformStrategy(ABC):
-    """
-    Abstract base class for transformation strategies for different categories.
-
-    This class defines the interface for transformation strategies that handle
-    category-specific data transformations in a DataFrame. Subclasses must implement
-    methods for applying transformations and creating category-specific columns.
-    """
-    @abstractmethod
-    def apply_transformations(self, dataframe: pd.DataFrame, logger) -> pd.DataFrame:
-        """
-        Apply specific transformations to the DataFrame.
-
-        Args:
-            dataframe (pd.DataFrame): The DataFrame to transform.
-            logger: A logger instance for recording the transformation process.
-
-        Returns:
-            pd.DataFrame: The transformed DataFrame.
-        """
-        return dataframe
-
-    @abstractmethod
-    def create_category_columns(self, dataframe: pd.DataFrame, logger) -> pd.DataFrame:
-        """
-        Creates category-specific columns in the DataFrame.
-
-        Args:
-            dataframe (pd.DataFrame): The DataFrame to modify.
-            logger: A logger instance for recording the column creation process.
-
-        Returns:
-            pd.DataFrame: The DataFrame with additional category-specific columns.
-        """
-        pass
-
-
-# Factory Class
-class TransformStrategyFactory:
-    """
-    Factory to create transformation strategies based on the category.
-
-    This class provides a method to obtain the appropriate transformation strategy
-    instance for a given category. It supports scalable addition of new categories
-    by mapping them to their corresponding strategy classes.
-    """
-
-    _strategies = {
-        'Bird': lambda: BirdTransformStrategy(),
-        'Mammal': lambda: MammalTransformStrategy(),
-        # Other mappings here when scaling
-    }
-
-    @staticmethod
-    def get_strategy(category: str) -> TransformStrategy:
-        """
-        Retrieve the transformation strategy for the specified category.
-
-        Args:
-            category (str): The category for which to retrieve the transformation strategy.
-
-        Returns:
-            TransformStrategy: An instance of the transformation strategy corresponding to the category.
-
-        Raises:
-            ValueError: If no strategy is defined for the specified category.
-        """
-        try:
-            return TransformStrategyFactory._strategies[category]()
-        except KeyError:
-            raise ValueError(f"No transformation strategy defined for category: {category}")
-
-
-# Concrete Strategy for Birds
 class BirdTransformStrategy(TransformStrategy):
     """
     Transformation strategy for Bird category.
@@ -237,20 +162,4 @@ class BirdTransformStrategy(TransformStrategy):
         dataframe = dataframe[columns_order]
 
         logger.info("Bird of prey data created.\n")
-        return dataframe
-
-
-# Concrete Strategy for Mammals
-class MammalTransformStrategy(TransformStrategy):
-    """
-    Transformation strategy for Mammal category.
-    """
-    def apply_transformations(self, dataframe: pd.DataFrame, logger) -> pd.DataFrame:
-        logger.info("APPLYING MAMMAL SPECIFIC TRANSFORMATIONS.\n")
-        # Add mammal-specific transformations here
-        return dataframe
-
-    def create_category_columns(self, dataframe: pd.DataFrame, logger) -> pd.DataFrame:
-        # Placeholder for mammal-specific column creation
-        logger.info("Mammal category columns creation (placeholder).\n")
         return dataframe
