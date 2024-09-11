@@ -2,7 +2,7 @@ import pandas as pd
 import re
 import requests
 from pandas.api.types import CategoricalDtype
-from utils import DataFrameUtils
+from ExtractTransform.utils.dataframe_utils import DataFrameUtils
 
 
 SPECIES_DATA_URL = "https://api.github.com/repos/pineapple-bois/USNationalParks/contents/DATA/Masters/species.csv"
@@ -189,6 +189,7 @@ class ExtractSpecies:
             'nativeness': 'Unknown',
             'occurrence': 'Not Confirmed'
         }
+
         conservation_status_order = ['Least Concern', 'Species of Concern', 'In Recovery', 'Under Review',
                                      'Threatened', 'Proposed Endangered', 'Endangered']
         abundance_order = ['Rare', 'Uncommon', 'Unknown', 'Occasional', 'Common', 'Abundant']
@@ -206,6 +207,11 @@ class ExtractSpecies:
         df['occurrence'] = pd.Categorical(df['occurrence'], categories=occurrence_order, ordered=True)
         df['nativeness'] = pd.Categorical(df['nativeness'], categories=nativeness_order, ordered=True)
         df['abundance'] = pd.Categorical(df['abundance'], categories=abundance_order, ordered=True)
+
+        # Verify if all 'conservation_status' entries are within the defined categories
+        df['conservation_status'] = df['conservation_status'].apply(
+            lambda x: x if x in conservation_status_order else 'Least Concern'
+        )
         df['conservation_status'] = pd.Categorical(df['conservation_status'], categories=conservation_status_order,
                                                    ordered=True)
 
@@ -214,3 +220,44 @@ class ExtractSpecies:
 
         self.dataframe = df
         return df
+
+    def assert_dataframe_integrity(self):
+        """
+        Asserts that the DataFrame meets specific integrity requirements:
+        - Certain columns have defined data types.
+        - No NaN values in key columns.
+
+        Expected Data Types:
+            - record_status: category
+            - occurrence: category
+            - nativeness: category
+            - abundance: category
+            - seasonality: object
+            - conservation_status: category
+            - is_protected: bool
+
+        Raises:
+            AssertionError: If any of the conditions are not met.
+        """
+        expected_types = {
+            'record_status': 'category',
+            'occurrence': 'category',
+            'nativeness': 'category',
+            'abundance': 'category',
+            'seasonality': 'object',
+            'conservation_status': 'category',
+            'is_protected': 'bool'
+        }
+
+        # Check column types
+        for column, expected_type in expected_types.items():
+            actual_type = str(self.dataframe[column].dtype)
+            assert actual_type == expected_type, \
+                f"Column '{column}' expected type '{expected_type}', but got '{actual_type}'."
+
+        # Check for NaN values
+        nan_counts = self.dataframe[expected_types.keys()].isna().sum()
+        nan_fields = nan_counts[nan_counts > 0].index.tolist()
+        assert not nan_fields, f"Columns with NaN values: {nan_fields}"
+
+        print("DataFrame integrity check passed: All columns have correct types and no NaN values.")
