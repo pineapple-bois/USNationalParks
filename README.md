@@ -20,9 +20,9 @@ Leveraging public domain datasets provided by the U.S. National Parks Service, t
 
 The ETL pipeline consists of multiple stages, each responsible for extracting, transforming, and loading specific data related to U.S. National Parks and their biodiversity.
 
-### [`extract_transform_parks.py`](extract_transform_parks.py) 
+### [`extract_transform_parks.py`](ExtractTransform/extract_transform_parks.py) 
 
-**Deliverables:** [`parks_points.geojson`](https://github.com/pineapple-bois/USNationalParks/blob/main/DATA/parks_points.geojson) & [`parks_shapes.geojson`](https://github.com/pineapple-bois/USNationalParks/blob/main/DATA/parks_shapes.geojson)
+**Deliverables:** [`parks_points.geojson`](https://github.com/pineapple-bois/USNationalParks/blob/main/ExtractTransform/FinalData/parks_points.geojson) & [`parks_shapes.geojson`](https://github.com/pineapple-bois/USNationalParks/blob/main/ExtractTransform/FinalData/parks_shapes.geojson)
 
 - **Data Source:** 
   - Geospatial data was sourced from [Data.gov](https://catalog.data.gov/dataset/national-park-boundaries/resource/cee04cfe-f439-4a65-91c0-ca2199fa5f93), an official site of the US government.
@@ -38,9 +38,9 @@ Spatial data is plotted below on a basemap to visualize park locations and bound
 
 ----
 
-### [`extract_transform_species.py`](extract_transform_species.py)
+### [`extract_transform_species.py`](ExtractTransform/extract_transform_species.py)
 
-**Deliverables:** [`birds.pkl`](https://github.com/pineapple-bois/USNationalParks/blob/main/DATA/birds.pkl) & [`birds.csv`](https://github.com/pineapple-bois/USNationalParks/blob/main/DATA/birds.csv)
+**Deliverable:** [`bird.pkl`](https://github.com/pineapple-bois/USNationalParks/blob/main/ExtractTransform/FinalData/bird.pkl)
 
 - **Data Source:** Species data was sourced from a [Kaggle dataset](https://www.kaggle.com/datasets/nationalparkservice/park-biodiversity?select=species.csv).
 - **Data Transformation:**
@@ -51,7 +51,7 @@ Spatial data is plotted below on a basemap to visualize park locations and bound
 
 ----
 
-### [`extract_transform_records.py`](extract_transform_records.py)
+### [`extract_transform_records.py`](ExtractTransform/extract_transform_records.py)
 
 **Deliverables:** [`species.csv`](https://github.com/pineapple-bois/USNationalParks/blob/main/DATA/species.csv) & [`records.csv`](https://github.com/pineapple-bois/USNationalParks/blob/main/DATA/records.csv)
 
@@ -72,22 +72,29 @@ Spatial data is plotted below on a basemap to visualize park locations and bound
 USNationalParks/
 │
 ├── DATA/
-│   ├── Backups/
 │   ├── Masters/
 │   │   ├── parks.csv
 │   │   └── species.csv
-│   ├── birds.csv
-│   ├── birds.pkl
-│   ├── nps_boundary.geojson
-│   ├── nps_boundary.xml
-│   ├── parks_points.geojson
-│   ├── parks_shapes.geojson
-│   ├── records.csv
-│   └── species.csv
+│   └── nps_boundary.geojson
 │
-├── Functions/
+├── ExtractTransform/
 │   ├── __init__.py
-│   └── transformation_functions.py
+│   ├── config/
+│   ├── FinalData/
+│   ├── transform_strategies/
+│   │   ├── __init__.py
+│   │   ├── abstract_strategy.py
+│   │   ├── bird_transform.py
+│   │   ├── mammal_transform.py
+│   │   └── strategy_factory.py
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── dataframe_transformation.py
+│   │   └── dataframe_utils.py
+│   ├── extract_species.py
+│   ├── extract_transform_parks.py
+│   ├── extract_transform_records.py
+│   └── transform_species.py
 │
 ├── Images/
 │   ├── USParksLatLong.png
@@ -98,10 +105,7 @@ USNationalParks/
 │   ├── test_parks_consistency.py
 │   └── test_record_consistency.py
 │
-├── extract_transform_parks.py
-├── extract_transform_records.py
-├── extract_transform_species.py
-│
+├── LICENSE.md
 └── README.md
 ```
 
