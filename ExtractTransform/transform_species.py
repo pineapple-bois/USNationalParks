@@ -2,11 +2,9 @@ import pandas as pd
 import yaml
 from collections import Counter
 
-from ExtractTransform.utils.dataframe_utils import DataFrameUtils
-from ExtractTransform.utils.dataframe_transformation import DataFrameTransformation
+from ExtractTransform.utils import DataFrameUtils, DataFrameTransformation
 from ExtractTransform.extract_species import ExtractSpecies
-from ExtractTransform.transform_category_abstract import (TransformStrategy, TransformStrategyFactory,
-                                         BirdTransformStrategy, MammalTransformStrategy)
+from ExtractTransform.transform_strategies.strategy_factory import TransformStrategyFactory
 
 
 # Add to below as required as and when abstract base methods written and testing completed
@@ -484,4 +482,3 @@ class TransformSpecies:
         # Apply extra methods based on specific category strategy
         strategy = TransformStrategyFactory.get_strategy(self.category)
         self.dataframe = strategy.apply_transformations(self.dataframe, self.logger)
-

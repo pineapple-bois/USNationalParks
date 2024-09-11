@@ -2,7 +2,7 @@ import pandas as pd
 import re
 import requests
 from pandas.api.types import CategoricalDtype
-from ExtractTransform.utils.dataframe_utils import DataFrameUtils
+from ExtractTransform.utils import DataFrameUtils
 
 
 SPECIES_DATA_URL = "https://api.github.com/repos/pineapple-bois/USNationalParks/contents/DATA/Masters/species.csv"
