@@ -51,7 +51,7 @@ class ExtractSpecies:
             Simplifies the seasonality values to a single keyword based on priority (e.g., 'Winter', 'Summer').
     """
     def __init__(self):
-        self.logger = DataFrameUtils.setup_logger('extract_species', 'extraction.log')
+        self.logger = DataFrameUtils.setup_logger('extract_species', 'extract_species.log')
         try:
             self.dataframe = self._load_and_clean_data()  # Initial loading and cleaning
         except Exception as e:
@@ -78,6 +78,7 @@ class ExtractSpecies:
             self.logger.error(f"Error transforming data: {e}")
             raise
 
+        print(f"Species master data created.\nShape: {self.dataframe.shape}")
         self.logger.info(f"Final DataFrame shape: {self.dataframe.shape}\n"
                          f"Data types after transformation:\n{self.dataframe.dtypes}")
         DataFrameUtils.pickle_data(self.dataframe,
@@ -273,4 +274,4 @@ class ExtractSpecies:
         nan_fields = nan_counts[nan_counts > 0].index.tolist()
         assert not nan_fields, f"Columns with NaN values: {nan_fields}"
 
-        print("DataFrame integrity check passed: All columns have correct types and no NaN values in critical fields.")
+        print("DataFrame integrity check passed:\nAll columns have correct types and no NaN values in critical fields.")
