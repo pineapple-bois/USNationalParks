@@ -64,7 +64,8 @@ class DataFrameUtils:
 
             # Check if the file was created and log success
             if os.path.exists(filepath):
-                logger.info(f"Dictionary successfully saved to {filepath}\n")
+                logger.info(f"Dictionary successfully saved to {filepath}\n"
+                            f"Review contents carefully and ensure all data is correct")
             else:
                 raise FileNotFoundError(f"File {filepath} was not found after saving.")
 
