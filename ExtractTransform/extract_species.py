@@ -16,6 +16,13 @@ class ExtractSpecies:
         dataframe (pd.DataFrame): The transformed DataFrame containing all species data.
         logger (logging.Logger): A logger object configured to log information about data processing.
 
+    Public Methods:
+        assert_dataframe_integrity():
+            Verifies the integrity of the DataFrame by ensuring that essential columns have the correct data types
+            and are free from NaN values. This method is publicly accessible and is intended to confirm that the
+            DataFrame meets specific integrity requirements for critical columns.
+
+
     Private Methods:
         _load_and_clean_data() -> pd.DataFrame:
             Loads species data from the specified URL, performs initial cleaning (e.g., renaming columns,
@@ -71,7 +78,13 @@ class ExtractSpecies:
             self.logger.error(f"Error transforming data: {e}")
             raise
 
-        self.logger.info(f"Data types after transformation:\n{self.dataframe.dtypes}")
+        self.logger.info(f"Final DataFrame shape: {self.dataframe.shape}\n"
+                         f"Data types after transformation:\n{self.dataframe.dtypes}")
+        DataFrameUtils.pickle_data(self.dataframe,
+                                   "FinalData",
+                                   "species_master.pkl",
+                                   self.logger
+                                   )
 
     def _load_and_clean_data(self):
         try:
@@ -260,4 +273,4 @@ class ExtractSpecies:
         nan_fields = nan_counts[nan_counts > 0].index.tolist()
         assert not nan_fields, f"Columns with NaN values: {nan_fields}"
 
-        print("DataFrame integrity check passed: All columns have correct types and no NaN values.")
+        print("DataFrame integrity check passed: All columns have correct types and no NaN values in critical fields.")
