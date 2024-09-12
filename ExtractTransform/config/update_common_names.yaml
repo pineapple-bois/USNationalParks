@@ -1,0 +1,22 @@
+# Manual selections based on Backups/category/Reviews/process_comma_separated_names.yaml
+manual_choices:
+  Bird:
+    updates:
+      scientific_name_updates:
+        "Butorides striata": "Butorides striatus"
+        "Charadrius vociferous": "Charadrius vociferus"
+        "Acanthus flammea": "Acanthis flammea"
+      common_name_updates:
+        "Butorides striatus": "Green-Backed Heron"
+        "Charadrius vociferus": "Killdeer"
+        "Acanthis flammea": "Common Redpoll"
+  Mammal:
+    updates:
+      scientific_name_updates:
+        "Lutra canadensis": "Lontra canadensis"
+        "Balaena glacialis": "Eubalaena glacialis"
+        "Scapanus townsendi": "Scapanus townsendii"
+      common_name_updates:
+        "Lontra canadensis": "North American River Otter"
+        "Eubalaena glacialis": "Northern Right Whale"
+        "Scapanus townsendii": "Townsend's Mole"

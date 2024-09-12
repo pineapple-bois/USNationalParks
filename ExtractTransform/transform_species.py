@@ -8,9 +8,7 @@ from ExtractTransform.transform_strategies.strategy_factory import TransformStra
 
 
 # Add to below as required as and when abstract base methods written and testing completed
-VALID_CATEGORIES = [
-    'Mammal', 'Bird', 'Reptile', 'Amphibian', 'Fish'
-]
+VALID_CATEGORIES = ['Mammal', 'Bird', 'Reptile']
 
 
 class TransformSpecies:
@@ -82,7 +80,7 @@ class TransformSpecies:
         self.logger.info(f"DataFrame created for category '{self.category}' with shape: {self.dataframe.shape}")
         self.logger.info(f"Records dropped during creation: {self.records_dropped}")
         DataFrameUtils.pickle_data(self.dataframe,
-                                   f'FinalData',
+                                   f'FinalData/Species',
                                    f'{formatted_category}.pkl',
                                    self.logger
                                    )
@@ -198,11 +196,17 @@ class TransformSpecies:
         return self.dataframe
 
     def _update_comma_sep_common_names(self):
+        """
+        Updates common names by resolving ambiguities based on category-specific logic, with special handling
+        for Birds and Mammals using manually defined mappings from a configuration file.
+        """
+        # Process potential matches but do not create automatic mappings
         sci_name_set = self.dataframe['scientific_name'].unique()
         potential_matches = DataFrameTransformation.process_comma_separated_names(
             self.dataframe, sci_name_set, match_score=90
         )
-        # Create a readable version for YAML saving
+
+        # Save potential matches to YAML for review
         readable_potential_matches = {
             sci_name: {
                 'matches': [{'match': match[0], 'score': match[1]} for match in info['matches']],
@@ -212,34 +216,53 @@ class TransformSpecies:
             for sci_name, info in potential_matches.items()
         }
 
-        # Save to YAML for review using the readable version
         DataFrameUtils.save_dict_to_yaml(
             readable_potential_matches,
             f'BackupData/{self.category}/Reviews',
             'process_comma_separated_names.yaml',
             self.logger
         )
-        common_name_mapping = {sci_name: info['most_common_name'] for sci_name, info in potential_matches.items()}
-        scientific_name_mapping = {sci_name: info['matches'][1][0] for sci_name, info in potential_matches.items()}
-        self.logger.info(f"Common Mapping: {common_name_mapping}")
-        self.logger.info(f"Sci Mapping: {scientific_name_mapping}")
 
-        # Define a helper to update rows based on the mappings
-        updated_indices = set()
-        def update_row(row):
+        # Load manual updates from YAML for Birds and Mammals
+        common_name_mapping = {}
+        scientific_name_mapping = {}
+        # Load manual updates from YAML for Birds and Mammals
+        if self.category in ['Bird', 'Mammal']:
+            manual_choices = DataFrameUtils.load_dict_from_yaml("config/update_common_names.yaml")
+            category_choices = manual_choices.get("manual_choices", {}).get(self.category, {})
+
+            # Update mappings and log them immediately after
+            scientific_name_mapping.update(category_choices.get('updates', {}).get('scientific_name_updates', {}))
+            common_name_mapping.update(category_choices.get('updates', {}).get('common_name_updates', {}))
+
+            self.logger.info(f"Scientific Name Mapping after update: {scientific_name_mapping}")
+            self.logger.info(f"Common Name Mapping after update: {common_name_mapping}")
+
+        # Unified helper function to update rows based on custom mappings
+        def update_row(row, common_name_mapping, scientific_name_mapping, updated_indices):
             sci_name = row['scientific_name']
-            if sci_name in common_name_mapping or sci_name in scientific_name_mapping:
+            new_sci_name = scientific_name_mapping.get(sci_name, sci_name)
+            new_common_name = common_name_mapping.get(new_sci_name, row['common_names'])
+            if new_sci_name != sci_name or new_common_name != row['common_names']:
                 updated_indices.add(row.name)
-                return (
-                    common_name_mapping.get(sci_name, row['common_names']),
-                    scientific_name_mapping.get(sci_name, sci_name)
-                )
+                return new_common_name, new_sci_name
             return row['common_names'], row['scientific_name']
 
-        self.dataframe[['common_names', 'scientific_name']] = self.dataframe.apply(
-            lambda row: pd.Series(update_row(row)), axis=1)
+        # Apply updates using the helper function for Birds and Mammals
+        updated_indices = set()
+        if self.category in ['Bird', 'Mammal']:
+            self.logger.info(f"Applying custom mappings for category '{self.category}'.")
+            self.dataframe[['common_names', 'scientific_name']] = self.dataframe.apply(
+                lambda row: pd.Series(update_row(row, common_name_mapping, scientific_name_mapping, updated_indices)),
+                axis=1
+            )
+
+            self.logger.info(f"Updated {len(updated_indices)} rows.\n")
+        else:
+            self.logger.warning("No custom mappings applied. Verify selections in process_comma_separated_names.yaml.")
 
         return self.dataframe
+
 
     def _resolve_sci_name_ambiguities(self):
         """
@@ -474,11 +497,20 @@ class TransformSpecies:
             self.logger.info("Resolving missing family fields:")
             self.dataframe = self._update_missing_family()
 
+            # Apply extra methods based on specific category strategy
+            strategy = TransformStrategyFactory.get_strategy(self.category)
+            self.dataframe = strategy.apply_transformations(self.dataframe, self.logger)
+
+        # Mammal-specific transformations
+        elif self.category == 'Mammal':
+            self.logger.info("Remapping comma-separated 'common_names':")
+            self.dataframe = self._update_comma_sep_common_names()
+
+            self.logger.info("Resolving Genus species ambiguities:")
+            self.dataframe = self._resolve_sci_name_ambiguities()
+
         # To scale to other categories, each method branched above should be tested
         # one by one with the new category to ensure compatibility and correctness.
-        if self.category == 'Mammal':
-            pass
-
-        # Apply extra methods based on specific category strategy
-        strategy = TransformStrategyFactory.get_strategy(self.category)
-        self.dataframe = strategy.apply_transformations(self.dataframe, self.logger)
+        elif self.category == 'Reptile':
+            self.logger.info("Remapping comma-separated 'common_names':")
+            self.dataframe = self._update_comma_sep_common_names()
