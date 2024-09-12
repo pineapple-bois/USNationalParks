@@ -7,8 +7,7 @@ manual_choices:
       'Junco hyemalis thurberi': "Dark-Eyed Junco (thurberi subspecies)"
       'Strix nebulosa nebulosa': "Great Gray Owl (nebulosa subspecies)"
       'Falco peregrinum anatum': "Peregrine Falcon (anatum subspecies)"
-  #Mammal:
-    #updates:
-      # Add mammal-specific updates here as needed
-      # Example:
-      # 'Mammal scientific name': "Updated common name"
+  Mammal:
+    updates:
+      'Long-Tailed Pocket Mouse': "Chaetodipus formosus mohavensis"
+      "Townsend's Big-Eared Bat": "Corynorhinus townsendii"

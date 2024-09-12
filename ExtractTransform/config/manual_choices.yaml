@@ -8,6 +8,10 @@ manual_choices:
     "Gray-Headed Chickadee": "Poecile cinctus"
     "Lawrence's Warbler": "Vermivora lawrencei"
     "Wandering Tattler": "Tringa incana"
-  #Mammal:
+  Mammal:
+    "Cliff Chipmunk": "Neotamias dorsalis"
+    "Indian Mongoose": "Herpestes auropunctatus"
+    "Panamint Chipmunk": "Neotamias panamintinus"
+    "Piute Ground Squirrel": "Urocitellus mollis"
 
-  # Add more categories and species as needed
+  # Add more categories as needed
