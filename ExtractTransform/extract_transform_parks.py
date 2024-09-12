@@ -140,7 +140,7 @@ def create_points_geojson(prepared_df, output_dir, logger):
         gpd.GeoDataFrame: GeoDataFrame with point geometries.
     """
     prepared_df['geometry'] = prepared_df.apply(lambda row: Point(row['longitude'], row['latitude']), axis=1)
-    geo_df_points = gpd.GeoDataFrame(prepared_df.drop(columns=['acres', 'latitude', 'longitude']),
+    geo_df_points = gpd.GeoDataFrame(prepared_df.drop(columns=['cleaned_park_name', 'acres', 'latitude', 'longitude']),
                                      geometry='geometry', crs="EPSG:4326")
     export_geojson(geo_df_points, os.path.join(output_dir, "parks_points.geojson"), "parks_points.geojson", logger)
     logger.info("Points GeoDataFrame created and exported.")
