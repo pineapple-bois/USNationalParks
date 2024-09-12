@@ -515,7 +515,7 @@ class DataFrameTransformation:
 
 
     @staticmethod
-    def filter_and_standardize_subspecies_names(subspecies_df, category, config):
+    def filter_and_standardize_subspecies_names(subspecies_df, category, config, logger):
         """
         Filters and standardizes subspecies common names based on configuration from a YAML file.
         """
@@ -525,14 +525,14 @@ class DataFrameTransformation:
 
         # Check if there are exclusions for the current category
         if not common_names_to_exclude:
-            logging.info(
+            logger.info(
                 f"No specific common names to exclude found for category '{category}'. Proceeding without exclusions.")
         else:
             subspecies_df = subspecies_df[~subspecies_df['matched_common_name'].isin(common_names_to_exclude)]
 
         # Check if there are columns to exclude from the DataFrame
         if not columns_to_exclude:
-            logging.info(f"No specific columns to exclude found. Proceeding without column exclusions.")
+            logger.info(f"No specific columns to exclude found. Proceeding without column exclusions.")
         else:
             subspecies_df = subspecies_df.drop(columns=columns_to_exclude, errors='ignore')
 
@@ -541,7 +541,7 @@ class DataFrameTransformation:
 
         # Apply standardization of common names
         if subspecies_df.empty:
-            logging.info(f"No subspecies records to standardize for category '{category}'.")
+            logger.info(f"No subspecies records to standardize for category '{category}'.")
         else:
             subspecies_df['common_names'] = subspecies_df.apply(
                 DataFrameTransformation.standardize_common_names_helper, axis=1
