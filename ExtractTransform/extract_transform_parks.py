@@ -13,6 +13,7 @@ from shapely.geometry import Point
 ## master url for GeoJSON data
 # https://catalog.data.gov/dataset/national-park-boundaries/resource/cee04cfe-f439-4a65-91c0-ca2199fa5f93
 
+
 def setup_logger():
     log_dir = "Logs"
     os.makedirs(log_dir, exist_ok=True)
@@ -245,7 +246,7 @@ def plot_geodataframe(geodf, title, output_path, logger, filter_states=('AK', 'H
     except Exception as e:
         logger.error(f"Failed to generate plot: {e}")
 
-def main():
+def process_parks_data(create_plots=True):
     logger = setup_logger()
     logger.info("Starting park transformation process.")
 
@@ -264,7 +265,6 @@ def main():
     gdf = fetch_geojson(api_url, logger)
 
     # Match and update parks
-    print("Matching parks between CSV and GeoJSON...")
     name_matches = match_parks(df, gdf, logger)
     updated_gdf = update_geojson(gdf, name_matches, logger)
 
@@ -282,26 +282,23 @@ def main():
     prepared_df = prepare_parks_dataframe(df, logger)
 
     # Create and export GeoJSON for park points
-    print("Creating and exporting GeoJSON for park points...")
     geo_df_points, prepared_df = create_points_geojson(prepared_df, output_dir, logger)
-
-    # Merge DataFrames and create shapes GeoJSON
-    print("Creating and exporting GeoJSON for park shapes...")
-    merged_geo_parks = merge_shape_data(prepared_df, geo_df, logger)
     geojson_path = os.path.join(output_dir, "parks_shapes.geojson")
-    export_geojson(merged_geo_parks, geojson_path, "parks_shapes.geojson", logger)
 
-    print("Exporting Image files...")
-    # Plot park points
-    plot_geodataframe(geo_df_points, title='National Parks of Contiguous USA',
+    # Create and export GeoJSON for park shapes
+    geo_df_shapes = merge_shape_data(prepared_df, geo_df, logger)
+    export_geojson(geo_df_shapes, geojson_path, "parks_shapes.geojson", logger)
+
+    if create_plots:
+        # Plot park points
+        plot_geodataframe(geo_df_points, title='National Parks of Contiguous USA',
                       output_path="../Images/USParksLatLong.png", logger=logger)
 
-    # Plot park shapes
-    plot_geodataframe(merged_geo_parks, title='National Parks of Contiguous USA',
+        # Plot park shapes
+        plot_geodataframe(geo_df_shapes, title='National Parks of Contiguous USA',
                       output_path="../Images/USParksShapes.png", logger=logger)
 
     print("Park transformation process completed.")
     logger.info("Park transformation process completed.")
 
-if __name__ == '__main__':
-    main()
+    return geo_df_points, geo_df_shapes
