@@ -1,6 +1,6 @@
-from .abstract_strategy import TransformStrategy
-from .bird_transform import BirdTransformStrategy
-from .mammal_transform import MammalTransformStrategy
+from ExtractTransform.transform_strategies.abstract_strategy import TransformStrategy
+from ExtractTransform.transform_strategies.bird_transform import BirdTransformStrategy
+from ExtractTransform.transform_strategies.mammal_transform import MammalTransformStrategy
 
 
 class TransformStrategyFactory:

@@ -1,8 +1,8 @@
 import pandas as pd
 import logging
 
-from ..utils import DataFrameUtils
-from .abstract_strategy import TransformStrategy
+from ExtractTransform.utils import DataFrameUtils
+from ExtractTransform.transform_strategies.abstract_strategy import TransformStrategy
 
 
 class BirdTransformStrategy(TransformStrategy):
@@ -13,7 +13,7 @@ class BirdTransformStrategy(TransformStrategy):
     identifying birds of prey by using common names and scientific families associated
     with birds of prey. It also handles corrections for known data discrepancies.
 
-    Birds of Prey Scientific Families and Genera:
+    Birds of Prey Scientific Families:
         - Accipitridae (Hawks, Eagles, and relatives)
         - Falconidae (Falcons)
         - Harpagiidae (Harriers)
@@ -52,23 +52,9 @@ class BirdTransformStrategy(TransformStrategy):
             pd.DataFrame: The DataFrame with bird-specific amendments applied.
         """
         logger.info("APPLYING BIRD-SPECIFIC TRANSFORMATIONS:\n")
-        # Attempt to correct discrepancies
-        result = self._correct_discrepancies(dataframe, logger)
-
-        # Check if the result is a DataFrame
-        if isinstance(result, pd.DataFrame):
-            logger.warning("Discrepancies found; returning DataFrame for manual review.")
-            return result
-
-        # If the result is not a DataFrame, it should be True indicating success
-        if result is True:
-            logger.info("Discrepancies corrected successfully.")
-            logger.info("Identifying birds of prey:")
-            dataframe = self.create_category_columns(dataframe, logger)
-        else:
-            # If result is neither True nor a DataFrame, log the issue
-            logger.error("Error correcting discrepancies; unexpected result type.")
-            return dataframe  # Returning the original dataframe as a fallback
+        dataframe = self._correct_discrepancies(dataframe, logger)
+        logger.info("Identifying birds of prey:")
+        dataframe = self.create_category_columns(dataframe, logger)
 
         # Future bird-specific transformations can be added here.
 

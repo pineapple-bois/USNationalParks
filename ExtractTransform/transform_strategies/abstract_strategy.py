@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 import logging
 
-from ..utils import DataFrameUtils
+from ExtractTransform.utils import DataFrameUtils
 
 
 class TransformStrategy(ABC):
