@@ -52,9 +52,23 @@ class BirdTransformStrategy(TransformStrategy):
             pd.DataFrame: The DataFrame with bird-specific amendments applied.
         """
         logger.info("APPLYING BIRD-SPECIFIC TRANSFORMATIONS:\n")
-        dataframe = self._correct_discrepancies(dataframe, logger)
-        logger.info("Identifying birds of prey:")
-        dataframe = self.create_category_columns(dataframe, logger)
+        # Attempt to correct discrepancies
+        result = self._correct_discrepancies(dataframe, logger)
+
+        # Check if the result is a DataFrame
+        if isinstance(result, pd.DataFrame):
+            logger.warning("Discrepancies found; returning DataFrame for manual review.")
+            return result
+
+        # If the result is not a DataFrame, it should be True indicating success
+        if result is True:
+            logger.info("Discrepancies corrected successfully.")
+            logger.info("Identifying birds of prey:")
+            dataframe = self.create_category_columns(dataframe, logger)
+        else:
+            # If result is neither True nor a DataFrame, log the issue
+            logger.error("Error correcting discrepancies; unexpected result type.")
+            return dataframe  # Returning the original dataframe as a fallback
 
         # Future bird-specific transformations can be added here.
 
