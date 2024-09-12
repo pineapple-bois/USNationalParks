@@ -3,7 +3,6 @@ import yaml
 from collections import Counter
 
 from ExtractTransform.utils import DataFrameUtils, DataFrameTransformation
-from ExtractTransform.extract_species import ExtractSpecies
 from ExtractTransform.transform_strategies.strategy_factory import TransformStrategyFactory
 
 
@@ -35,23 +34,19 @@ class TransformSpecies:
         category (str): The category of species to filter from the DataFrame.
         dataframe (pd.DataFrame): The subset of the DataFrame containing only the specified category.
         logger (logging.Logger): A logger object configured to log information specific to the category.
+        records_dropped (int): Counter for the number of records dropped during transformations.
 
     Methods:
-        __init__(category: str):
+        __init__(category: str, dataframe: pd.DataFrame = None, pickle_path: str = None):
             Initializes the TransformSpecies class, sets up logging for the specified category,
-            loads and subsets the species data for further transformations.
+            and loads the species data either from a provided DataFrame or from a pickle file.
+            It verifies the integrity of the DataFrame, subsets the data by the specified category,
+            and applies category-specific transformations.
 
         _subset_category() -> pd.DataFrame:
             Filters the transformed DataFrame to include only the specified category.
-
-        _remove_genus_only_records():
-            Identifies and removes records that contain only the genus name in the 'scientific_name' field,
-            logs the actions, and saves these records to a CSV file.
-
-        _apply_category_transformations():
-            Applies the appropriate transformation strategy based on the category.
     """
-    def __init__(self, category):
+    def __init__(self, category, dataframe=None, pickle_path=None):
         if not isinstance(category, str):
             raise TypeError("Category must be a string.")
         if category not in VALID_CATEGORIES:
@@ -60,10 +55,23 @@ class TransformSpecies:
         self.category = category
         formatted_category = self.category.lower().replace(" ", "_").replace("/", "_")
         self.logger = DataFrameUtils.setup_logger(f'transform_{formatted_category}',
-                                                  f'transformation_{formatted_category}.log')
+                                                  f'transform_{formatted_category}.log')
         self.records_dropped = 0
-        extract_species = ExtractSpecies()
-        self.dataframe = extract_species.dataframe
+
+        # Load the DataFrame from the provided pickle path or accept the given DataFrame
+        if dataframe is not None:
+            self.dataframe = dataframe
+            self.verify_dataframe(self.dataframe)
+        elif pickle_path:
+            self.logger.info(f"Loading DataFrame from {dataframe_path}")
+            try:
+                self.dataframe = pd.read_pickle(dataframe_path)
+                self.verify_dataframe(self.dataframe)  # Verify the DataFrame
+            except Exception as e:
+                self.logger.error(f"Error loading DataFrame: {e}")
+                raise
+        else:
+            raise ValueError("A valid dataframe or dataframe path must be provided to load species data.")
 
         try:
             self.dataframe = self._subset_category()  # Subset by category
@@ -77,6 +85,8 @@ class TransformSpecies:
             self.logger.error(f"Error applying transformations for category '{self.category}': {e}")
             raise
 
+        print(f"{self.category} data created:\n{self.dataframe.species_id.nunique()} records"
+              f"\n{self.dataframe.species_id.nunique()} unique scientific names")
         self.logger.info(f"DataFrame created for category '{self.category}' with shape: {self.dataframe.shape}")
         self.logger.info(f"Records dropped during creation: {self.records_dropped}")
         DataFrameUtils.pickle_data(self.dataframe,
@@ -84,6 +94,57 @@ class TransformSpecies:
                                    f'{formatted_category}.pkl',
                                    self.logger
                                    )
+
+    def verify_dataframe(self, dataframe):
+        """
+        Verifies that the DataFrame meets the required structure and content for species data.
+
+        Checks include:
+        - Presence of essential columns.
+        - Correct data types for critical columns.
+        - Validating the shape or row count if necessary.
+
+        Args:
+            dataframe (pd.DataFrame): The DataFrame to verify.
+
+        Raises:
+            ValueError: If any verification check fails.
+        """
+        expected_columns = {
+            'species_id': 'object',
+            'park_code': 'object',
+            'scientific_name': 'object',
+            'common_names': 'object',
+            'category': 'object',
+            'record_status': 'category',
+            'occurrence': 'category',
+            'nativeness': 'category',
+            'abundance': 'category',
+            'seasonality': 'object',
+            'conservation_status': 'category',
+            'is_protected': 'bool'
+        }
+
+        # Check for missing columns
+        missing_columns = set(expected_columns.keys()) - set(dataframe.columns)
+        if missing_columns:
+            self.logger.error(f"Missing required columns: {missing_columns}")
+            raise ValueError(f"DataFrame is missing required columns: {missing_columns}")
+
+        # Check data types
+        for column, expected_type in expected_columns.items():
+            actual_type = str(dataframe[column].dtype)
+            if actual_type != expected_type:
+                self.logger.error(f"Column '{column}' expected type '{expected_type}', but got '{actual_type}'.")
+                raise ValueError(f"Column '{column}' expected type '{expected_type}', but got '{actual_type}'.")
+
+        # Check the shape or number of rows
+        expected_shape = (119247, 15)  # Adjust based on your data's expected shape
+        if dataframe.shape != expected_shape:
+            self.logger.warning(f"DataFrame shape {dataframe.shape} differs from expected {expected_shape}.")
+            # You can decide if this should raise an error or just log a warning
+
+        self.logger.info("DataFrame verification passed:\n")
 
     def _subset_category(self):
         """Filters the transformed DataFrame to include only the specified category."""
@@ -222,6 +283,7 @@ class TransformSpecies:
             'process_comma_separated_names.yaml',
             self.logger
         )
+        self.logger.warning(f"Found {len(potential_matches)} matches requiring manual review.")
 
         # Load manual updates from YAML for Birds and Mammals
         common_name_mapping = {}
@@ -282,7 +344,7 @@ class TransformSpecies:
                                          self.logger)
 
         if ties_for_review:
-            self.logger.info(f"Found {len(ties_for_review)} common names with ties requiring manual review.")
+            self.logger.warning(f"Found {len(ties_for_review)} common names with ties requiring manual review.")
             # Save to YAML for review
             DataFrameUtils.save_dict_to_yaml(ties_for_review,
                                              f'BackupData/{self.category}/Reviews',
@@ -306,9 +368,9 @@ class TransformSpecies:
         updated_count = len(updated_records_df)
 
         if updated_count > 0:
-            self.logger.info(f"Updated {updated_count} records with new scientific names.")
+            self.logger.info(f"Updated {updated_count} records with new scientific names.\n")
         else:
-            self.logger.info("No records updated with new scientific names.")
+            self.logger.info("No records updated with new scientific names.\n")
         self.records_dropped += (original_count - len(self.dataframe))
 
         return self.dataframe
@@ -323,7 +385,7 @@ class TransformSpecies:
         subspecies_df = DataFrameTransformation.identify_subspecies(self.dataframe)
         subspecies_df = DataFrameTransformation.map_genus_species_to_common_names(self.dataframe, subspecies_df)
         updated_subspecies_df = DataFrameTransformation.filter_and_standardize_subspecies_names(
-            subspecies_df, self.category, config
+            subspecies_df, self.category, config, self.logger
         )
 
         filtered_indices = updated_subspecies_df.index
@@ -481,7 +543,7 @@ class TransformSpecies:
         self.dataframe = self._update_records_nan_common_names()
 
         # Bird-specific transformations
-        if self.category == 'Bird':
+        if self.category in ['Bird', 'Mammal']:
             self.logger.info("Remapping comma-separated 'common_names':")
             self.dataframe = self._update_comma_sep_common_names()
 
@@ -501,16 +563,12 @@ class TransformSpecies:
             strategy = TransformStrategyFactory.get_strategy(self.category)
             self.dataframe = strategy.apply_transformations(self.dataframe, self.logger)
 
-        # Mammal-specific transformations
-        elif self.category == 'Mammal':
-            self.logger.info("Remapping comma-separated 'common_names':")
-            self.dataframe = self._update_comma_sep_common_names()
-
-            self.logger.info("Resolving Genus species ambiguities:")
-            self.dataframe = self._resolve_sci_name_ambiguities()
-
         # To scale to other categories, each method branched above should be tested
         # one by one with the new category to ensure compatibility and correctness.
         elif self.category == 'Reptile':
             self.logger.info("Remapping comma-separated 'common_names':")
             self.dataframe = self._update_comma_sep_common_names()
+
+        else:
+            # Define more categories as required
+            pass
