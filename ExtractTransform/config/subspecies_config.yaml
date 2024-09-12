@@ -13,9 +13,6 @@ common_names_to_exclude:
     - "Prairie Chicken"
     - "Golden-Winged Warbler"
     - "Blue-Winged Warbler"
-  #Mammal:
-    #- #
-    #- #
 
 columns_to_exclude:
   default:
