@@ -123,6 +123,8 @@ class MammalTransformStrategy(TransformStrategy):
         columns_order = dataframe.columns.tolist()
         common_names_index = columns_order.index('common_names')
         columns_order.insert(common_names_index + 1, columns_order.pop(columns_order.index('predator_group')))
+        predator_group_index = columns_order.index('predator_group')
+        columns_order.insert(predator_group_index + 1, columns_order.pop(columns_order.index('is_large_predator')))
         dataframe = dataframe[columns_order]
 
         return dataframe

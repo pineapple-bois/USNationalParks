@@ -159,6 +159,8 @@ class BirdTransformStrategy(TransformStrategy):
         columns_order = dataframe.columns.tolist()
         common_names_index = columns_order.index('common_names')
         columns_order.insert(common_names_index + 1, columns_order.pop(columns_order.index('raptor_group')))
+        raptor_group_index = columns_order.index('raptor_group')
+        columns_order.insert(raptor_group_index + 1, columns_order.pop(columns_order.index('is_raptor')))
         dataframe = dataframe[columns_order]
 
         logger.info("Bird of prey data created.\n")
