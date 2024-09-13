@@ -41,7 +41,7 @@ ExtractTransform/
 The Extract Transform pipeline produces several key deliverables, each aimed at ensuring data integrity, traceability, and ease of review:
 
 Pandas DataFrames
-- DataFrames are staged within [`pipeline.py`](pipeline.py) ready to populate a PostgreSQL database (the load stage)
+- DataFrames are staged within [`pipeline.py`](../pipeline.py) ready to populate a PostgreSQL database (the load stage)
 
 Pickle Files:
 - The dataframes are saved as pickle files, categorised by species (e.g., Bird, Mammal, Reptile, ...) ensuring future loading tasks use high fidelity data.
@@ -62,7 +62,7 @@ YAML Files for Manual Review:
 
 ## Species Data
 
-### [`extract_species.py`](ExtractTransform/utils/extract_species.py)
+### [`extract_species.py`](extract_species.py)
 
 Extracts a [public domain dataset](https://www.kaggle.com/datasets/nationalparkservice/park-biodiversity?select=species.csv) provided by the U.S. National Parks Service using the GitHub API. This data is stored in the DATA directory at this repositories root
 
@@ -83,7 +83,7 @@ The `ExtractSpecies` class orchestrates the extraction, cleaning, and transforma
 
 ---
 
-### [`transform_species.py`](ExtractTransform/utils/transform_species.py)
+### [`transform_species.py`](transform_species.py)
 
 Subsets the data by `category` and aims to normalise species records whereby each unique `scientific_name` has an associated unique `common_name` using regular expressions, counter objects and pattern matching. The process is automated but requires user input when scaling to new categories. 
 
@@ -103,28 +103,28 @@ bird_df = birds.dataframe
 ```
 The precise data structure of the `extract_species` stage is then verified.
 
-### [`transform_strategies/`](ExtractTransform/transform_strategies/)
+### `transform_strategies/`
 
 - This module implements a strategy pattern for transforming species data by category. The module includes an abstract base class and concrete strategy implementations for specific categories like Birds and Mammals. These strategies are designed to handle category-specific data transformations, ensuring that each species is correctly identified and categorised based on domain-specific rules.
 
-#### [`abstract_strategy.py`](ExtractTransform/transform_strategies/abstract_strategy.py)
+#### [`abstract_strategy.py`](transform_strategies/abstract_strategy.py)
 
 Defines the `TransformStrategy` abstract base class, which serves as a blueprint for all category-specific transformation strategies. It outlines two essential methods:
 
 - `apply_transformations()`: Applies the necessary transformations to the DataFrame for the specific category.
 - `create_category_columns()`: Adds category-specific columns to the DataFrame, enhancing data with relevant domain-specific attributes.
 
-#### [`strategy_factory.py`](ExtractTransform/transform_strategies/strategy_factory.py)
+#### [`strategy_factory.py`](transform_strategies/strategy_factory.py)
 
 - The `TransformStrategyFactory` class provides a mechanism to dynamically select and instantiate the appropriate transformation strategy based on the species category. This approach allows for scalable extension as new categories are added, simply by defining new strategy classes and registering them with the factory.
 
-#### [`bird_transform.py`](ExtractTransform/transform_strategies/bird_transform.py)
+#### [`bird_transform.py`](transform_strategies/bird_transform.py)
 
 Implements the `BirdTransformStrategy` class, tailored for the Bird category. Key functionalities include:
 
 - **Identifying Raptors/Birds of Prey**: Uses predefined lists of common names and scientific families associated with raptors to identify and flag birds of prey. This allows the dataset to be enriched with the specific attributes; `raptor_group` and boolean `is_raptor`, facilitating targeted analysis of these species.
 
-#### [`mammal_transform.py`](ExtractTransform/transform_strategies/mammal_transform.py)
+#### [`mammal_transform.py`](transform_strategies/mammal_transform.py)
 
 Implements the `MammalTransformStrategy` class, designed for the Mammal category. Key functionalities include:
 
@@ -141,7 +141,7 @@ This strategic approach not only enhances the dataset with domain-specific knowl
 
 ---
 
-### [`transform_records.py`](ExtractTransform/utils/transform_records.py)
+### [`transform_records.py`](transform_records.py)
 
 Manages the transformation, normalisation, and consolidation of species records across different categories to ensure data consistency and integrity.
 
@@ -163,7 +163,7 @@ By assigning unique species codes and verifying data integrity, the class helps 
 
 ## National Parks Data
 
-### [`extract_transform_parks.py`](ExtractTransform/extract_transform_parks.py)
+### [`extract_transform_parks.py`](extract_transform_parks.py)
 
 **Deliverables:** 
 - [parks_points.geojson](https://github.com/pineapple-bois/USNationalParks/blob/main/ExtractTransform/FinalData/parks_points.geojson)
