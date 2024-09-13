@@ -82,7 +82,7 @@ class ExtractSpecies:
         self.logger.info(f"Final DataFrame shape: {self.dataframe.shape}\n"
                          f"Data types after transformation:\n{self.dataframe.dtypes}")
         DataFrameUtils.pickle_data(self.dataframe,
-                                   "FinalData",
+                                   "Pipeline/FinalData",
                                    "species_master.pkl",
                                    self.logger
                                    )
@@ -116,8 +116,10 @@ class ExtractSpecies:
         # Filter records where 'record_status' is not 'Approved' or 'In Review'
         non_standard_status_records = df[~df['record_status'].isin(['Approved', 'In Review'])].copy()
         self.logger.info(f"Found {len(non_standard_status_records)} records with non-standard 'record_status'.")
-        DataFrameUtils.save_dataframe_to_csv(non_standard_status_records, "BackupData",
-                                             "incorrect_records.csv", self.logger)
+        DataFrameUtils.save_dataframe_to_csv(non_standard_status_records,
+                                             "Pipeline/BackupData",
+                                             "incorrect_records.csv",
+                                             self.logger)
 
         # Indices that need correction based on 'non_standard_status_records'
         indices_to_shift = non_standard_status_records.index
@@ -168,8 +170,11 @@ class ExtractSpecies:
 
         df_to_save = df_with_non_standard_chars[['category', 'scientific_name', 'common_names']]
         self.logger.info(f"Found {len(df_to_save)} records with non-standard characters.")
-        DataFrameUtils.save_dataframe_to_csv(df_to_save, "BackupData",
-                                             "nonstandard_chars.csv", self.logger)
+        DataFrameUtils.save_dataframe_to_csv(df_to_save,
+                                             "Pipeline/BackupData",
+                                             "nonstandard_chars.csv",
+                                             self.logger
+                                             )
 
         # Clean the non-standard characters in place in the copy
         for column in columns_with_issues:

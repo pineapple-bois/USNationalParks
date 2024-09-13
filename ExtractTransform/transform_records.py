@@ -131,7 +131,8 @@ class TransformRecords:
 
         # Concatenate the DataFrames now that they have consistent dimensions
         self.records = pd.concat([bird_copy, mammal_copy, reptile_copy],
-                                 ignore_index=True).sort_values(by=['category', 'order'])
+                                 ignore_index=True).sort_values(by='species_id')
+        self.records = self.records.reset_index(drop=True)
         self.logger.info(f"Final records DataFrame created with shape: {self.records.shape}")
 
     def verify_integrity_of_records(self):

@@ -15,7 +15,7 @@ from shapely.geometry import Point
 
 
 def setup_logger():
-    log_dir = "Logs"
+    log_dir = "Pipeline/Logs"
     os.makedirs(log_dir, exist_ok=True)
     log_file = os.path.join(log_dir, 'extract_transform_parks.log')
     logger = logging.getLogger('transformation_parks')
@@ -253,8 +253,10 @@ def process_parks_data(create_plots=True):
     # Define URLs and output directory
     csv_url = "https://raw.githubusercontent.com/pineapple-bois/USNationalParks/main/DATA/Masters/parks.csv"
     api_url = "https://api.github.com/repos/pineapple-bois/USNationalParks/contents/DATA/nps_boundary.geojson"
-    output_dir = "FinalData"
+    output_dir = "Pipeline/FinalData"
+    images_dir = "Pipeline/Images"
     os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(images_dir, exist_ok=True)
 
     # Load and clean data
     print("Loading parks CSV data...")
@@ -291,12 +293,20 @@ def process_parks_data(create_plots=True):
 
     if create_plots:
         # Plot park points
-        plot_geodataframe(geo_df_points, title='National Parks of Contiguous USA',
-                      output_path="../Images/USParksLatLong.png", logger=logger)
+        plot_geodataframe(
+            geo_df_points,
+            title='National Parks of Contiguous USA',
+            output_path=os.path.join(images_dir, "USParksLatLong.png"),
+            logger=logger
+        )
 
         # Plot park shapes
-        plot_geodataframe(geo_df_shapes, title='National Parks of Contiguous USA',
-                      output_path="../Images/USParksShapes.png", logger=logger)
+        plot_geodataframe(
+            geo_df_shapes,
+            title='National Parks of Contiguous USA',
+            output_path=os.path.join(images_dir, "USParksShapes.png"),
+            logger=logger
+        )
 
     print("Park transformation process completed.")
     logger.info("Park transformation process completed.")

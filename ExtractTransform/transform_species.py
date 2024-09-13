@@ -86,11 +86,11 @@ class TransformSpecies:
             raise
 
         print(f"{self.category} data created:\n{self.dataframe.species_id.nunique()} records"
-              f"\n{self.dataframe.species_id.nunique()} unique scientific names")
+              f"\n{self.dataframe.scientific_name.nunique()} unique scientific names")
         self.logger.info(f"DataFrame created for category '{self.category}' with shape: {self.dataframe.shape}")
         self.logger.info(f"Records dropped during creation: {self.records_dropped}")
         DataFrameUtils.pickle_data(self.dataframe,
-                                   f'FinalData/Species',
+                                   f'Pipeline/FinalData/Species',
                                    f'{formatted_category}.pkl',
                                    self.logger
                                    )
@@ -139,7 +139,7 @@ class TransformSpecies:
                 raise ValueError(f"Column '{column}' expected type '{expected_type}', but got '{actual_type}'.")
 
         # Check the shape or number of rows
-        expected_shape = (119247, 15)  # Adjust based on your data's expected shape
+        expected_shape = (119247, 15)
         if dataframe.shape != expected_shape:
             self.logger.warning(f"DataFrame shape {dataframe.shape} differs from expected {expected_shape}.")
             # You can decide if this should raise an error or just log a warning
@@ -161,7 +161,7 @@ class TransformSpecies:
 
         # Log and save the records with genus-only names
         self.logger.info(f"Found {len(df_to_save)} Genus-only (generic) records.")
-        DataFrameUtils.save_dataframe_to_csv(df_to_save, f"BackupData/{self.category}",
+        DataFrameUtils.save_dataframe_to_csv(df_to_save, f"Pipeline/BackupData/{self.category}",
                                              "genus_records_dropped.csv", self.logger)
         self.records_dropped += len(df_to_save)
         self.logger.info(f"{len(df_to_save)} records dropped.\n")
@@ -230,8 +230,11 @@ class TransformSpecies:
         nan_common_names_records = self.dataframe[self.dataframe['common_names'].isna()]
         nan_sci_names = nan_common_names_records['scientific_name'].unique().tolist()
         self.logger.info(f"Found {nan_common_names_records.shape[0]} scientific names with no associated common name.")
-        DataFrameUtils.save_dataframe_to_csv(nan_common_names_records, f"BackupData/{self.category}",
-                                             "nan_common_names.csv", self.logger)
+        DataFrameUtils.save_dataframe_to_csv(nan_common_names_records,
+                                             f"Pipeline/BackupData/{self.category}",
+                                             "nan_common_names.csv",
+                                             self.logger
+                                             )
 
         # Perform fuzzy matching to find potential common names
         matches = DataFrameTransformation.fuzzy_match_scientific_names(nan_sci_names, self.dataframe)
@@ -279,7 +282,7 @@ class TransformSpecies:
 
         DataFrameUtils.save_dict_to_yaml(
             readable_potential_matches,
-            f'BackupData/{self.category}/Reviews',
+            f'Pipeline/BackupData/{self.category}/Reviews',
             'process_comma_separated_names.yaml',
             self.logger
         )
@@ -290,7 +293,7 @@ class TransformSpecies:
         scientific_name_mapping = {}
         # Load manual updates from YAML for Birds and Mammals
         if self.category in ['Bird', 'Mammal']:
-            manual_choices = DataFrameUtils.load_dict_from_yaml("config/update_common_names.yaml")
+            manual_choices = DataFrameUtils.load_dict_from_yaml("ExtractTransform/config/update_common_names.yaml")
             category_choices = manual_choices.get("manual_choices", {}).get(self.category, {})
 
             # Update mappings and log them immediately after
@@ -339,7 +342,7 @@ class TransformSpecies:
             potential_issues_df)
         self.logger.info(f"Selected scientific names for {len(selected_sci_names)} common names based on highest counts.")
         DataFrameUtils.save_dict_to_yaml(selected_sci_names,
-                                         f'BackupData/{self.category}/Reviews',
+                                         f'Pipeline/BackupData/{self.category}/Reviews',
                                          'resolve_sci_name_ambiguities_selected.yaml',
                                          self.logger)
 
@@ -347,12 +350,12 @@ class TransformSpecies:
             self.logger.warning(f"Found {len(ties_for_review)} common names with ties requiring manual review.")
             # Save to YAML for review
             DataFrameUtils.save_dict_to_yaml(ties_for_review,
-                                             f'BackupData/{self.category}/Reviews',
+                                             f'Pipeline/BackupData/{self.category}/Reviews',
                                              'resolve_sci_name_ambiguities_ties.yaml',
                                              self.logger)
 
         # Apply manual choices from configuration
-        manual_choices = DataFrameUtils.load_dict_from_yaml("config/manual_choices.yaml")
+        manual_choices = DataFrameUtils.load_dict_from_yaml("ExtractTransform/config/manual_choices.yaml")
         category_manual_choices = manual_choices.get("manual_choices", {}).get(self.category, {})
         if not category_manual_choices:
             self.logger.info(
@@ -380,7 +383,7 @@ class TransformSpecies:
         Standardizes the common names for subspecies in the DataFrame by mapping them to their
         corresponding genus-species common names, appending subspecies information where applicable.
         """
-        config = DataFrameUtils.load_dict_from_yaml('config/subspecies_config.yaml')
+        config = DataFrameUtils.load_dict_from_yaml('ExtractTransform/config/subspecies_config.yaml')
 
         subspecies_df = DataFrameTransformation.identify_subspecies(self.dataframe)
         subspecies_df = DataFrameTransformation.map_genus_species_to_common_names(self.dataframe, subspecies_df)
@@ -411,12 +414,12 @@ class TransformSpecies:
             common_name_to_sci_names_counts[common_name] = dict(sci_names_counts)
 
         DataFrameUtils.save_dict_to_yaml(common_name_to_sci_names_counts,
-                                         f'BackupData/{self.category}/Reviews',
+                                         f'Pipeline/BackupData/{self.category}/Reviews',
                                          'update_common_names_with_subspecies.yaml',
                                          self.logger)
 
         # Load updates from the configuration
-        manual_choices = DataFrameUtils.load_dict_from_yaml('config/manual_verification.yaml')
+        manual_choices = DataFrameUtils.load_dict_from_yaml('ExtractTransform/config/manual_verification.yaml')
         category_updates = manual_choices.get("manual_choices", {}).get(self.category, {}).get('updates', {})
         # Check if there are any updates for the current category
         if not category_updates:
@@ -445,7 +448,7 @@ class TransformSpecies:
         if not nan_family_records.empty:
             DataFrameUtils.save_dataframe_to_csv(
                 nan_family_records,
-                f"BackupData/{self.category}",
+                f"Pipeline/BackupData/{self.category}",
                 "nan_family_records_before_update.csv",
                 self.logger
             )
@@ -568,6 +571,9 @@ class TransformSpecies:
         elif self.category == 'Reptile':
             self.logger.info("Remapping comma-separated 'common_names':")
             self.dataframe = self._update_comma_sep_common_names()
+
+            self.logger.info("Resolving Genus species ambiguities:")
+            self.dataframe = self._resolve_sci_name_ambiguities()
 
         else:
             # Define more categories as required
