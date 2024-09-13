@@ -166,8 +166,8 @@ By assigning unique species codes and verifying data integrity, the class helps 
 ### [`extract_transform_parks.py`](extract_transform_parks.py)
 
 **Deliverables:** 
-- [parks_points.geojson](https://github.com/pineapple-bois/USNationalParks/blob/main/ExtractTransform/FinalData/parks_points.geojson)
-- [parks_shapes.geojson](https://github.com/pineapple-bois/USNationalParks/blob/main/ExtractTransform/FinalData/parks_shapes.geojson)
+- [parks_points.geojson](https://github.com/pineapple-bois/USNationalParks/blob/main/ExtractTransform/testing/Data/parks_points.geojson)
+- [parks_shapes.geojson](https://github.com/pineapple-bois/USNationalParks/blob/main/ExtractTransform/testing/Data/parks_shapes.geojson)
 
 **Data Sources:** 
 - Geospatial data was sourced from [Data.gov](https://catalog.data.gov/dataset/national-park-boundaries/resource/cee04cfe-f439-4a65-91c0-ca2199fa5f93), an official site of the US government.
