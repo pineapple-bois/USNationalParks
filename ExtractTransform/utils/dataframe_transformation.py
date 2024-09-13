@@ -255,7 +255,7 @@ class DataFrameTransformation:
         if not identified_records.empty:
             DataFrameUtils.save_dataframe_to_csv(
                 identified_records,
-                f"BackupData/{category}",
+                f"Pipeline/BackupData/{category}",
                 f"{column_name}_records.csv",
                 logger
             )
@@ -303,7 +303,7 @@ class DataFrameTransformation:
             filename = f"unmatched_records_{identifier}.csv"  # Unique filename
             DataFrameUtils.save_dataframe_to_csv(
                 records_to_drop,
-                f"BackupData/{category}",
+                f"Pipeline/BackupData/{category}",
                 filename,
                 logger
             )
@@ -333,7 +333,7 @@ class DataFrameTransformation:
         if not multi_common_names_records.empty:
             DataFrameUtils.save_dataframe_to_csv(
                 multi_common_names_records,
-                f"BackupData/{category}",
+                f"Pipeline/BackupData/{category}",
                 "multi_common_names_ambiguities.csv",
                 logger
             )
@@ -357,7 +357,7 @@ class DataFrameTransformation:
                 filename = f"unstandardized_subspecies_records.csv"
                 DataFrameUtils.save_dataframe_to_csv(
                     records_to_drop,
-                    f"BackupData/{category}",
+                    f"Pipeline/BackupData/{category}",
                     filename,
                     logger
                 )
@@ -438,7 +438,7 @@ class DataFrameTransformation:
             logger.info(f"Identified {len(potential_issues_df)} potential ambiguities in common names.")
             DataFrameUtils.save_dataframe_to_csv(
                 potential_issues_df,
-                f"BackupData/{category}",
+                f"Pipeline/BackupData/{category}",
                 "scientific_name_ambiguities.csv",
                 logger
             )

@@ -29,7 +29,7 @@ class DataFrameUtils:
     @staticmethod
     def setup_logger(name, log_filename):
         """Configures a logger with a specified name and log file."""
-        log_dir = os.path.join(os.getcwd(), 'Logs')
+        log_dir = os.path.join(os.getcwd(), 'Pipeline/Logs')
         os.makedirs(log_dir, exist_ok=True)
         logger = logging.getLogger(name)
         logger.setLevel(logging.INFO)
