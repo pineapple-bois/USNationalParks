@@ -10,8 +10,8 @@ from ExtractTransform.utils import DataFrameUtils
 
 def main():
     # Database connection parameters
-    db_user = 'ADD_USER_NAME'
-    db_password = 'ADD_PASSWORD'
+    db_user = 'YOUR_USER_NAME'
+    db_password = 'YOUR_PASSWORD'
     db_host = 'localhost'
     db_port = '5432'  # Usually 5432
     db_name = 'national_parks'   # Change if you created Db with another name
