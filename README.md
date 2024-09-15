@@ -4,31 +4,31 @@
 
 ### Overview
 
-This project aims to build a partially normalized OLAP (Online Analytical Processing) database to support complex analytical queries on U.S. National Parks, focusing on their biodiversity. The ETL pipeline processes raw biodiversity data from U.S. National Parks into a structured format for analysis in a PostgreSQL database. 
+This project builds a partially normalised OLAP (Online Analytical Processing) database to support complex analytical queries on U.S. National Parks, focusing on their biodiversity. The ETL pipeline processes raw biodiversity data from the U.S. National Parks Service into a structured format for analysis in a PostgreSQL database.
 
-The pipeline includes:
+### Pipeline includes:
 
-- **Data Extraction**: Raw data is collected from public sources.
-- **Data Transformation**: The data is cleaned and standardised, fixing missing values and normalising species names.
-- **Data Loading**: Loads the transformed data into a PostgreSQL database designed for complex analysis.
+- **Data Extraction**: Collects raw data from public sources.
+- **Data Transformation**: Cleans and standardises the data, fixing missing values and normalising species names.
+- **Data Loading**: Loads the transformed data into a PostgreSQL database for complex analysis.
 
 ### Features
 
-- **Data Quality**: The pipeline fixes duplicates, inconsistencies, and missing values to ensure reliable data.
+- **Data Quality**: Resolves duplicates, inconsistencies, and missing values to ensure reliable data.
 - **Geospatial Analysis**: Integrates geospatial data to explore species distributions within park boundaries.
-- **Modular Design**: Takes an OOP approach making it easy to add new species categories to the database.
-- **Error Handling and Logging**: Tracks every step with detailed logs and handles errors efficiently.
-- **Consistency Checks**: Runs tests to ensure primary keys (`park_code` and `species_code`) have a unique constraint.
+- **Modular Design**: Uses an object-oriented approach, making it easy to add new species categories.
+- **Error Handling and Logging**: Provides detailed logs and manages errors efficiently.
+- **Consistency Checks**: Ensures unique constraints for primary keys (`park_code` and `species_code`).
 
 ---
 
 ### [Extract Transform Module](ExtractTransform)
 
-Data was sourced from an open source [Kaggle Dataset](https://www.kaggle.com/datasets/nationalparkservice/park-biodiversity?select=species.csv) provided by the US National Parks service.
+Data was sourced from an open-source [Kaggle Dataset](https://www.kaggle.com/datasets/nationalparkservice/park-biodiversity?select=species.csv) provided by the U.S. National Parks Service.
 
-The main transformation process subsets the data by category, (`Bird`, `Mammal`, `Reptile`, ...) and normalises the taxonomic records. As the records represent National Parks across the USA, often the `scientific_name` (representing *Genus species*) had many; associated common names, typographical errors, and ambiguities. This project necessitates the creation of a master table of taxonomic information; `order, family, scientific_name, common_name` in order to assign a unique reference number to each species and thus abstract it from the records.
+The main transformation process subsets the data by category (`Bird`, `Mammal`, `Reptile`, etc.) and normalises the taxonomic records. Species often have multiple common names, typographical errors, and ambiguities. To address this, a master table of taxonomic information (`order`, `family`, `scientific_name`, `common_name`) was created, assigning a unique reference number to each species.
 
-As a simple example, we consider the bird of prey species; *Accipiter gentilis* which had the following associated common names:
+Example: Considering *Accipiter gentilis* (Northern Goshawk), various common names were normalised:
 
 | scientific_name    | common_names                               |
 |--------------------|--------------------------------------------|
@@ -36,21 +36,14 @@ As a simple example, we consider the bird of prey species; *Accipiter gentilis* 
 | Accipiter gentilis | Northern Goshawk                           |
 | Accipiter gentilis | Goshawk                                    |
 
-As this developer lacks domain expertise in taxonomic nomenclature, decisions on the 'right name' to select were driven by the dataset itself utilising; regular expressions, `collections.Counter` objects, and cross-referencing to find typos.
+The standardisation process used regular expressions, `collections.Counter` objects, and cross-referencing to resolve ambiguities and errors, improving the quality and consistency of the data.
 
-The above example illuminates the issue of data provenance. The [Northern Goshawk](https://en.wikipedia.org/wiki/Northern_goshawk) was designated as a separate species *Astur atricapillus*, the "American Goshawk" in 2023. A master table of taxonomic information makes it easy to update the database if and when new science on species formerly considered conspecific comes to light. 
+#### Object-Oriented Approach
 
-#### Object Orientated approach
+The abstract base class model allows for category-specific transformation strategies. For instance:
 
-
-
-
-
-
-
----
-
-
+- **Birds**: The `BirdTransformStrategy` handles subspecies and identifies attributes like `raptor_group` and `is_raptor`.
+- **Plants**: Represents about 65,000 records, often including subspecies and hybrids. The object orientated structure supports the development of plant-specific filters and attributes, such as identifying `cacti` or `invasive_species`.
 
 ---
 
@@ -144,7 +137,7 @@ df2 = pd.read_sql_query(sql_query2, engine)
 
 ### PostgreSQL Database Design
 
-The PostgreSQL database [schema](schema.sql) is designed to manage U.S. National Parks data efficiently. It includes custom ENUM types, primary keys, a composite primary key, and foreign keys to maintain data integrity and support complex analytical queries.
+The PostgreSQL database [schema](schema.sql) is designed to manage U.S. National Parks data efficiently. It includes custom ENUM types, primary keys, foreign keys, and a composite primary key to maintain data integrity and support complex analytical queries.
 
 #### Spatial Data Integration
 
@@ -153,7 +146,6 @@ The schema integrates geospatial data using [PostGIS](https://postgis.net), with
 #### Entity Relationship Diagram
 
 ![img](Images/EntityRelationship.png)
-
 
 
 #### Primary Keys
@@ -185,36 +177,122 @@ These standardise and constrain values for categorical fields in the `records` t
 
 ----
 
-### Getting Started
+### Getting Started Guide
 
-To set up and run the pipeline:
+#### 1. Create the dataset within your environment
 
-1. **Clone the Repository**:
-    ```bash
-    git clone https://github.com/your-repo-url
-    ```
+Clone the Repository:
+```bash
+git clone https://github.com/your-repo-url
+```
 
-2. **Install Required Packages**:
-    - Use the provided `requirements.txt` file to install necessary Python packages:
-    ```bash
-    pip install -r requirements.txt
-    ```
+Create a virtual environment:
+```bash
+# Navigate into the project directory
+cd your-repo-directory
 
-3. **Run the ETL Pipeline**:
-    - Execute the main script to run the extract, transform, and load processes:
-    ```bash
-    python pipeline.py
-    ```
+# Create a virtual environment named 'venv'
+python -m venv venv
 
-4. **Access the Database**:
-    - Once the data is loaded, connect to the PostgreSQL database to explore and analyze the data using SQL queries.
+# Activate the virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+```
+
+Install Required Packages:
+- Use the provided `requirements.txt` file to install necessary Python packages:
+```bash
+pip install -r requirements.txt
+```
+
+Extract and Transform the raw data:
+- Execute the main script to run the extract and transform processes:
+```bash
+python data_extraction.py
+ ```
+
+The data extraction will create a new folder `Pipeline` in the current working directory which contains `BackupData`, `Logs`, `FinalData` and `Images`.
+
+----
+
+#### 2. Set up the PostgreSQL database
+
+The database schema uses the PostGIS extension which has a great [Getting Started Guide](https://postgis.net/documentation/getting_started/) which covers PostgreSQL and PostGIS installation appropriate to your OS. 
+
+Assuming you have PostgreSQL and PostGIS correctly installed and configured, follow these steps:
+
+Create the Database:
+```sql
+-- Open the PostgreSQL command line or use a client like pgAdmin
+CREATE DATABASE national_parks;
+```
+```sql
+-- Connect to the national_parks database
+\c national_parks
+```
+
+----
+
+#### 3. Run the Schema
+
+Run the provided schema file to set up the tables:
+```bash
+# From the root directory of the repository, execute:
+psql -d national_parks -f schema.sql
+```
+---
+
+#### 4. Populate the Tables
+
+To populate the tables, use the [data_loading.py](data_loading.py) script, which will load the transformed data into your PostgreSQL database. Before running the script, ensure that you update your database username and password in the script:
+1.	Open the data_loading.py file.
+2. Update the following lines with your PostgreSQL credentials:
+```python
+db_user = 'YOUR_USER_NAME'       # Replace with your database username
+db_password = 'YOUR_PASSWORD'    # Replace with your database password
+```
+3.	The script includes a function clear_table_data(engine, logger) that clears existing data from the tables if they already exist, ensuring that you start with a clean slate each time you run the script.
+4. To execute the data loading process, run:
+```bash
+# Execute the data loading script
+python data_loading.py
+```
+This script will:
+
+- Clear existing data from the tables (if any).
+- Load data from the FinalData directory into the respective tables (parks, birds, mammals, records, park_points, and park_shapes).
+- Log the status of each operation to data_loading.log, including verification of the data insertion process.
+
+Ensure the script runs without errors to fully populate your database with the extracted and transformed data, ready for analysis!
 
 ---
 
 ### Future Enhancements
 
-- **Extend to Additional Species**: Expand the pipeline to include other species categories such as reptiles and amphibians.
-- **Enhanced Spatial Analysis**: Integrate more sophisticated spatial analysis tools and visualizations.
+- **Extend to Additional Species**: Expand the pipeline to include more species categories, such as reptiles, amphibians, and plants, leveraging the modular design of the ETL process.
+- **Enhanced Spatial Analysis**: Integrate more advanced spatial analysis tools and visualisations to explore relationships between species distributions and park geographies.
+- **Dynamic Taxonomic Updates**: Connect the database to a reputable taxonomic data source, such as the [Integrated Taxonomic Information System (ITIS)](https://www.itis.gov/) or [Catalogue of Life](https://www.catalogueoflife.org/), to dynamically update species information in response to taxonomic changes. This will ensure that the database remains current with the latest scientific consensus, allowing for automatic updates to species records when new classifications or name changes occur.
 
+The [Northern Goshawk](https://en.wikipedia.org/wiki/Northern_goshawk) was designated as a separate species *Astur atricapillus*, the "American Goshawk" in 2023. A master table of taxonomic information makes it easy to update the database if and when new science on species formerly considered conspecific to others comes to light. Integrating a connection to live taxonomic databases would further enhance the robustness and accuracy of the system, keeping it aligned with current taxonomy.
 
+---
 
+### Contributions
+
+We welcome issues, feedback, and contributions from the community to improve this project. If you encounter any issues, have suggestions for enhancements, or wish to contribute, please feel free to raise an issue on our GitHub repository or contact us directly.
+
+For contributions, please follow these steps:
+
+1. Fork the repository and create a new branch for your feature or bug fix.
+2. Make your changes, ensuring code quality and consistency with the project's guidelines.
+3. Submit a pull request with a detailed description of your changes.
+
+For any inquiries or further discussion, contact us via email at: [iwood@posteo.net](mailto:iwood@posteo.net)
+
+We look forward to your contributions!
+
+[![Licence: MIT](https://img.shields.io/badge/Licence-MIT-yellow.svg)](LICENSE.md) [![Pineapple Bois](https://img.shields.io/badge/Website-Pineapple_Bois-5087B2.svg?style=flat&logo=telegram)](https://pineapple-bois.github.io)
+
+----
