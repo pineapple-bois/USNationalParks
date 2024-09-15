@@ -152,8 +152,8 @@ The schema integrates geospatial data using [PostGIS](https://postgis.net), with
 
 - Each table is uniquely identified by a primary key:
   - `parks` table: `park_code`
-  - `park_points` and `park_shapes` tables: `park_code`, aligning spatial data with corresponding parks.
-  - `birds` and `mammals` tables: `species_code`, ensuring unique identification of species.
+  - `park_points` and `park_shapes` tables: `park_code`
+  - `birds` `mammals` & `reptiles` tables: `species_code`
 
 - **Composite Primary Key**:
   - The `records` table uses a composite primary key (`park_code`, `species_code`), supporting a many-to-many relationship between parks and species.
