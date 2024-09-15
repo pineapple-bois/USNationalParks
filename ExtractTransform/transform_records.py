@@ -67,8 +67,29 @@ class TransformRecords:
                                    self.logger
                                    )
 
+        # Process Reptiles
+        reptile_df = self.reptile[['category', 'order', 'family', 'scientific_name',
+                             'common_names']]
+        self.reptile_records, next_index = self.assign_species_codes(reptile_df, 'order', start_index=next_index)
+        reptile_copy = self.reptile_records.copy()
+        reptile_copy = reptile_copy.drop(columns=['category'], errors='ignore')
+        columns_order = ['species_code'] + [col for col in reptile_copy.columns if col != 'species_code']
+        reptile_copy = reptile_copy[columns_order]
+        reptile_copy = reptile_copy.reset_index(drop=True)
+        self.reptile_records = reptile_copy
+        self.logger.info(f"Reptile DataFrame has final shape: {self.reptile_records.shape}")
+        DataFrameUtils.pickle_data(self.reptile_records,
+                                   "Pipeline/FinalData",
+                                   "reptile_master.pkl",
+                                   self.logger
+                                   )
+
         # Merge Species Code with Records
-        species_df = pd.concat([self.bird_records, self.mammal_records], ignore_index=True)
+        species_df = pd.concat([
+                                self.bird_records,
+                                self.mammal_records,
+                                self.reptile_records
+                              ], ignore_index=True)
         merge_keys = ['scientific_name']
         self.all_records = pd.merge(
                                 self.records,
@@ -87,7 +108,7 @@ class TransformRecords:
         ]
         records_copy = records_copy[required_columns]
         self.all_records = records_copy
-        self.generate_data_dictionary(self.bird_records, self.mammal_records)
+        self.generate_data_dictionary(self.bird_records, self.mammal_records, self.reptile_records)
 
         # Remove duplicates
         duplicates = records_copy[records_copy.duplicated(subset=['park_code', 'species_code'], keep=False)]
@@ -121,7 +142,8 @@ class TransformRecords:
         mapping = {
             'Bird': 'bird',
             'Mammal': 'mammal',
-            'Reptile': 'reptile'
+            'Reptile': 'reptile',
+            'Amphibian': 'amphibian'
         }
 
         for idx, df in enumerate(self.dataframes, start=1):
@@ -189,7 +211,7 @@ class TransformRecords:
         print("Data integrity check passed")
         self.logger.info(
             f"Integrity check passed: All columns have correct values and no duplicates for scientific names.\n"
-            f"Unique records count: {unique_records_count}")
+            f"Unique species count: {unique_records_count}")
 
     @staticmethod
     def assign_species_codes(dataframe, sort_column, start_index=1):
