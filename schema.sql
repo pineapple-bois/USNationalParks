@@ -41,7 +41,8 @@ CREATE TABLE records (
     seasonality VARCHAR,
     conservation_status conservation_status_type NOT NULL,
     is_protected BOOLEAN,
-    PRIMARY KEY (park_code, species_code)
+    PRIMARY KEY (park_code, species_code),
+    FOREIGN KEY (park_code) REFERENCES parks (park_code) ON DELETE CASCADE
 );
 
 CREATE TABLE parks (
