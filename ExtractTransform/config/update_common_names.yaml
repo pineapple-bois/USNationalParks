@@ -20,3 +20,11 @@ manual_choices:
         "Lontra canadensis": "North American River Otter"
         "Eubalaena glacialis": "Northern Right Whale"
         "Scapanus townsendii": "Townsend's Mole"
+  Reptile:
+    updates:
+      scientific_name_updates:
+        "Crotalis viridis": "Crotalus viridis"
+        "Lepidochelys kempi": "Lepidochelys kempii"
+      common_name_updates:
+        "Crotalus viridis": "Prairie Rattlesnake"
+        "Lepidochelys kempii": "Kemp's Ridley Sea Turtle"

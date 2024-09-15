@@ -13,5 +13,6 @@ manual_choices:
     "Indian Mongoose": "Herpestes auropunctatus"
     "Panamint Chipmunk": "Neotamias panamintinus"
     "Piute Ground Squirrel": "Urocitellus mollis"
-
-  # Add more categories as needed
+  Reptile:
+    "California Lyresnake": "Trimorphodon lyrophanes"
+  # Add more categories and species as needed

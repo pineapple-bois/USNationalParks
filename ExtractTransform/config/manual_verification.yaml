@@ -11,3 +11,6 @@ manual_choices:
     updates:
       'Long-Tailed Pocket Mouse': "Chaetodipus formosus mohavensis"
       "Townsend's Big-Eared Bat": "Corynorhinus townsendii"
+  Reptile:
+    updates:
+      'California Kingsnake': 'Lampropeltis californiae'
