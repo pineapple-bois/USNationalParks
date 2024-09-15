@@ -7,7 +7,7 @@ from ExtractTransform.transform_strategies.strategy_factory import TransformStra
 
 
 # Add to below as required as and when abstract base methods written and testing completed
-VALID_CATEGORIES = ['Mammal', 'Bird', 'Reptile']
+VALID_CATEGORIES = ['Mammal', 'Bird', 'Reptile', 'Amphibian', 'Spider/Scorpion']
 
 
 class TransformSpecies:
@@ -292,7 +292,7 @@ class TransformSpecies:
         common_name_mapping = {}
         scientific_name_mapping = {}
         # Load manual updates from YAML for Birds and Mammals
-        if self.category in ['Bird', 'Mammal']:
+        if self.category in ['Bird', 'Mammal', 'Reptile']:
             manual_choices = DataFrameUtils.load_dict_from_yaml("ExtractTransform/config/update_common_names.yaml")
             category_choices = manual_choices.get("manual_choices", {}).get(self.category, {})
 
@@ -315,7 +315,7 @@ class TransformSpecies:
 
         # Apply updates using the helper function for Birds and Mammals
         updated_indices = set()
-        if self.category in ['Bird', 'Mammal']:
+        if self.category in ['Bird', 'Mammal', 'Reptile']:
             self.logger.info(f"Applying custom mappings for category '{self.category}'.")
             self.dataframe[['common_names', 'scientific_name']] = self.dataframe.apply(
                 lambda row: pd.Series(update_row(row, common_name_mapping, scientific_name_mapping, updated_indices)),
@@ -529,8 +529,8 @@ class TransformSpecies:
             None: Updates are applied directly to the class instance's dataframe attribute.
 
         Example:
-            To extend this method to handle 'Mammal' category, add:
-                if self.category == 'Mammal':
+            To extend this method to handle 'Amphibian' category, add:
+                if self.category == 'Amphibian':
                     # Insert Mammal-specific transformation methods here
         """
 
@@ -546,7 +546,7 @@ class TransformSpecies:
         self.dataframe = self._update_records_nan_common_names()
 
         # Bird-specific transformations
-        if self.category in ['Bird', 'Mammal']:
+        if self.category in ['Bird', 'Mammal', 'Reptile']:
             self.logger.info("Remapping comma-separated 'common_names':")
             self.dataframe = self._update_comma_sep_common_names()
 
@@ -568,13 +568,23 @@ class TransformSpecies:
 
         # To scale to other categories, each method branched above should be tested
         # one by one with the new category to ensure compatibility and correctness.
-        elif self.category == 'Reptile':
+        elif self.category == 'Amphibian':
+            pass
             self.logger.info("Remapping comma-separated 'common_names':")
             self.dataframe = self._update_comma_sep_common_names()
 
             self.logger.info("Resolving Genus species ambiguities:")
             self.dataframe = self._resolve_sci_name_ambiguities()
 
+            # self.logger.info("Resolving subspecies ambiguities:")
+            # self.dataframe = self._standardize_subspecies_common_names()
+
+            # self.logger.info("Resolving scientific_name ambiguities:")
+            # self.dataframe = self._update_common_names_with_subspecies()
+
+            # self.logger.info("Resolving missing family fields:")
+            # self.dataframe = self._update_missing_family()
+
+        # Define more categories as required
         else:
-            # Define more categories as required
             pass
