@@ -1,6 +1,7 @@
 from ExtractTransform.transform_strategies.abstract_strategy import TransformStrategy
 from ExtractTransform.transform_strategies.bird_transform import BirdTransformStrategy
 from ExtractTransform.transform_strategies.mammal_transform import MammalTransformStrategy
+from ExtractTransform.transform_strategies.reptile_transform import ReptileTransformStrategy
 
 
 class TransformStrategyFactory:
@@ -15,6 +16,7 @@ class TransformStrategyFactory:
     _strategies = {
         'Bird': lambda: BirdTransformStrategy(),
         'Mammal': lambda: MammalTransformStrategy(),
+        'Reptile': lambda: ReptileTransformStrategy(),
         # Other mappings here when scaling
     }
 
