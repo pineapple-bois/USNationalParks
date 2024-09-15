@@ -10,8 +10,8 @@ from ExtractTransform.utils import DataFrameUtils
 
 def main():
     # Database connection parameters
-    db_user = 'YOUR_USER_NAME'
-    db_password = 'YOUR_PASSWORD'
+    db_user = 'Ian'
+    db_password = 'DAVEda1108'
     db_host = 'localhost'
     db_port = '5432'  # Usually 5432
     db_name = 'national_parks'   # Change if you created Db with another name
@@ -32,12 +32,13 @@ def main():
         data_dir = 'Pipeline/FinalData'
         birds_file = os.path.join(data_dir, 'bird_master.pkl')
         mammals_file = os.path.join(data_dir, 'mammal_master.pkl')
+        reptiles_file = os.path.join(data_dir, 'reptile_master.pkl')
         records_file = os.path.join(data_dir, 'record_master.pkl')
         parks_points_file = os.path.join(data_dir, 'parks_points.geojson')
         parks_shapes_file = os.path.join(data_dir, 'parks_shapes.geojson')
 
         # Check if all required files exist
-        required_files = [birds_file, mammals_file, records_file, parks_points_file, parks_shapes_file]
+        required_files = [birds_file, mammals_file, reptiles_file, records_file, parks_points_file, parks_shapes_file]
         missing_files = [f for f in required_files if not os.path.exists(f)]
 
         if missing_files:
@@ -49,6 +50,7 @@ def main():
         logger.info('Loading DataFrames from files.')
         birds_master = pd.read_pickle(birds_file)
         mammals_master = pd.read_pickle(mammals_file)
+        reptiles_master = pd.read_pickle(reptiles_file)
         records_master = pd.read_pickle(records_file)
         parks_points = gpd.read_file(parks_points_file)
         parks_shapes = gpd.read_file(parks_shapes_file)
@@ -84,6 +86,10 @@ def main():
             # Insert mammals data
             mammals_master.to_sql('mammals', connection, if_exists='append', index=False)
             logger.info('Inserted mammals data.')
+
+            # Insert reptiles data
+            reptiles_master.to_sql('reptiles', connection, if_exists='append', index=False)
+            logger.info('Inserted reptiles data.')
 
             # Insert records data
             records_master.to_sql('records', connection, if_exists='append', index=False)

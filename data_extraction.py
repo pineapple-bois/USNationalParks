@@ -21,8 +21,11 @@ def main():
     mammal_data = TransformSpecies("Mammal", dataframe=species_df)
     mammal_df = mammal_data.dataframe
 
+    reptile_data = TransformSpecies("Reptile", dataframe=species_df)
+    reptile_df = reptile_data.dataframe
+
     # Step 4: Generate Database table data
-    TransformRecords([bird_df, mammal_df])
+    TransformRecords([bird_df, mammal_df, reptile_df])
 
 
 if __name__ == '__main__':

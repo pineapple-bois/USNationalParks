@@ -30,6 +30,23 @@ CREATE TABLE mammals (
     is_large_predator BOOLEAN
 );
 
+-- Create reptiles table
+CREATE TABLE reptiles (
+    species_code VARCHAR PRIMARY KEY,
+    "order" VARCHAR NOT NULL,
+    family VARCHAR NOT NULL,
+    scientific_name VARCHAR NOT NULL,
+    common_names VARCHAR
+);
+
+-- Create parks table
+CREATE TABLE parks (
+    park_code VARCHAR PRIMARY KEY,
+    park_name VARCHAR NOT NULL,
+    state VARCHAR NOT NULL,
+    square_km NUMERIC
+);
+
 -- Create records table
 CREATE TABLE records (
     park_code VARCHAR NOT NULL,
@@ -43,13 +60,6 @@ CREATE TABLE records (
     is_protected BOOLEAN,
     PRIMARY KEY (park_code, species_code),
     FOREIGN KEY (park_code) REFERENCES parks (park_code) ON DELETE CASCADE
-);
-
-CREATE TABLE parks (
-    park_code VARCHAR PRIMARY KEY,
-    park_name VARCHAR NOT NULL,
-    state VARCHAR NOT NULL,
-    square_km NUMERIC
 );
 
 -- Create park_points table
