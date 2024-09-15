@@ -30,8 +30,8 @@ class TransformRecords:
         self.logger.info(f"Initialized TransformRecords with {len(dataframes)} DataFrame(s).")
         self._assign_dataframes()
         self._finalize_records()
-        self.select_random_indices(count=15)
         self.verify_integrity_of_records()
+        self.select_random_indices(count=15)
 
         # Process Birds
         bird_df = self.bird[['category', 'order', 'family', 'scientific_name',
@@ -69,8 +69,13 @@ class TransformRecords:
 
         # Merge Species Code with Records
         species_df = pd.concat([self.bird_records, self.mammal_records], ignore_index=True)
-        self.all_records = pd.merge(self.records, species_df[['scientific_name', 'species_code']], on='scientific_name',
-                              how='left')
+        merge_keys = ['scientific_name']
+        self.all_records = pd.merge(
+                                self.records,
+                                species_df[merge_keys + ['species_code']],
+                                on=merge_keys,
+                                how='left'
+        )
 
         records_copy = self.all_records.copy()
         required_columns = [
@@ -81,16 +86,33 @@ class TransformRecords:
             'is_protected'
         ]
         records_copy = records_copy[required_columns]
-        records_copy = records_copy.reset_index(drop=True)
         self.all_records = records_copy
+        self.generate_data_dictionary(self.bird_records, self.mammal_records)
+
+        # Remove duplicates
+        duplicates = records_copy[records_copy.duplicated(subset=['park_code', 'species_code'], keep=False)]
+        non_duplicates = records_copy.drop(duplicates.index)
+        self.logger.info("Exporting duplicate records to CSV")
+        DataFrameUtils.save_dataframe_to_csv(duplicates,
+                                             "Pipeline/BackupData",
+                                             "duplicate_records.csv",
+                                             self.logger
+                                             )
+        deduplicated_duplicates = duplicates.groupby(['park_code', 'species_code']).apply(
+                                                     TransformRecords.deduplicate_group).reset_index(drop=True)
+        records_copy = pd.concat([non_duplicates, deduplicated_duplicates], ignore_index=True)
+        records_copy = records_copy.reset_index(drop=True)
+        dupes = records_copy[records_copy.duplicated(subset=['park_code', 'species_code'], keep=False)]
+        assert dupes.shape[0] == 0, "Duplicate Records still exist"
+        self.all_records = records_copy
+        dupes_removed = len(self.all_records) - len(non_duplicates)
+        self.logger.info(f"Removed {dupes_removed} duplicate records")
         self.logger.info(f"Records DataFrame has final shape: {self.all_records.shape}")
         DataFrameUtils.pickle_data(self.all_records,
                                    "Pipeline/FinalData",
                                    "record_master.pkl",
                                    self.logger
                                    )
-
-        self.generate_data_dictionary(self.bird_records, self.mammal_records)
 
     def _assign_dataframes(self):
         """
@@ -133,7 +155,7 @@ class TransformRecords:
         self.records = pd.concat([bird_copy, mammal_copy, reptile_copy],
                                  ignore_index=True).sort_values(by='species_id')
         self.records = self.records.reset_index(drop=True)
-        self.logger.info(f"Final records DataFrame created with shape: {self.records.shape}")
+        self.logger.info(f"Initial records DataFrame created with shape: {self.records.shape}")
 
     def verify_integrity_of_records(self):
         """
@@ -191,6 +213,37 @@ class TransformRecords:
             lambda x: f"{x:04d}")  # Format codes with leading zeros
         return dataframe, start_index + len(dataframe)  # Return updated dataframe and next start index
 
+    @staticmethod
+    def deduplicate_group(group):
+        # Access grouping columns via group.name
+        park_code, species_code = group.name
+        group = group.copy()
+        group['park_code'] = park_code
+        group['species_code'] = species_code
+
+        # Rule 1: Drop records where 'is_protected' is True if there's a False
+        if group['is_protected'].nunique() > 1:
+            group = group[group['is_protected'] == False]
+        if len(group) == 1:
+            return group.iloc[0]
+
+        # Rule 2: Drop 'Unknown' in specified columns if other values exist
+        cols = ['occurrence', 'nativeness', 'abundance', 'seasonality']
+        for col in cols:
+            if 'Unknown' in group[col].values and group[col].nunique() > 1:
+                group = group[group[col] != 'Unknown']
+                if len(group) == 1:
+                    return group.iloc[0]
+
+        # Rule 3: Drop 'In Review' if 'Approved' exists
+        if group['record_status'].nunique() > 1:
+            if 'Approved' in group['record_status'].values:
+                group = group[group['record_status'] == 'Approved']
+        if len(group) == 1:
+            return group.iloc[0]
+
+        # Rule 4: Arbitrarily drop duplicates if they are identical
+        return group.iloc[0]
 
     def generate_data_dictionary(self, *species_dataframes):
         """
