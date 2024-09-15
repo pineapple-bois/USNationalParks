@@ -40,9 +40,6 @@ ExtractTransform/
 
 The Extract Transform pipeline produces several key deliverables, each aimed at ensuring data integrity, traceability, and ease of review:
 
-Pandas DataFrames
-- DataFrames are staged within [`pipeline.py`](../pipeline.py) ready to populate a PostgreSQL database (the load stage)
-
 Pickle Files:
 - The dataframes are saved as pickle files, categorised by species (e.g., Bird, Mammal, Reptile, ...) ensuring future loading tasks use high fidelity data.
 
