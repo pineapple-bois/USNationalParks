@@ -19,6 +19,7 @@ WHERE b.common_names = 'California Condor'
 ORDER BY r.occurrence DESC, r.abundance DESC;
 
 
+--- Count of birds of prey by park
 SELECT
     p.park_name,
     p.state,
@@ -29,3 +30,15 @@ LEFT JOIN parks AS p ON r.park_code = p.park_code
 WHERE b.is_raptor = True
 GROUP BY p.park_name, p.state
 ORDER BY raptor_count DESC;
+
+
+-- Count of species by park
+SELECT
+    p.park_name,
+    p.state,
+    COUNT(*) AS total_species
+FROM records AS r
+LEFT JOIN birds AS b ON r.species_code = b.species_code
+LEFT JOIN parks AS p ON r.park_code = p.park_code
+GROUP BY p.park_name, p.state
+ORDER BY total_species DESC;

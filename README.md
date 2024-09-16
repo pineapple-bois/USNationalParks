@@ -131,7 +131,7 @@ df2 = pd.read_sql_query(sql_query2, engine)
 
 ### PostgreSQL Database Design
 
-The PostgreSQL database [schema](schema.sql) is designed to manage U.S. National Parks data efficiently. It includes custom ENUM types, primary keys, foreign keys, and a composite primary key to maintain data integrity and support complex analytical queries.
+The PostgreSQL database [schema](SQL/schema.sql) is designed to manage U.S. National Parks data efficiently. It includes custom ENUM types, primary keys, foreign keys, and a composite primary key to maintain data integrity and support complex analytical queries.
 
 #### Spatial Data Integration
 
@@ -234,7 +234,7 @@ CREATE DATABASE national_parks;
 Run the provided schema file to set up the tables:
 ```bash
 # From the root directory of the repository, execute:
-psql -d national_parks -f schema.sql
+psql -d national_parks -f SQL/schema.sql
 ```
 ---
 
