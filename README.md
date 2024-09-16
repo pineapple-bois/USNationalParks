@@ -6,13 +6,7 @@
 
 This project builds a partially normalised OLAP (Online Analytical Processing) database to support complex analytical queries on U.S. National Parks, focusing on their biodiversity. The ETL pipeline processes raw biodiversity data from the U.S. National Parks Service into a structured format for analysis in a PostgreSQL database.
 
-### Pipeline includes:
-
-- **Data Extraction**: Collects raw data from public sources.
-- **Data Transformation**: Cleans and standardises the data, fixing missing values and normalising species names.
-- **Data Loading**: Loads the transformed data into a PostgreSQL database for complex analysis.
-
-### Features
+#### Features
 
 - **Data Quality**: Resolves duplicates, inconsistencies, and missing values to ensure reliable data.
 - **Geospatial Analysis**: Integrates geospatial data to explore species distributions within park boundaries.
@@ -145,7 +139,7 @@ The schema integrates geospatial data using [PostGIS](https://postgis.net), with
 
 #### Entity Relationship Diagram
 
-![img](Images/EntityRelationship.png)
+![img](Images/EntityRelationshipDiagram.png)
 
 
 #### Primary Keys
@@ -262,7 +256,7 @@ python data_loading.py
 This script will:
 
 - Clear existing data from the tables (if any).
-- Load data from the FinalData directory into the respective tables (parks, birds, mammals, records, park_points, and park_shapes).
+- Load data from the FinalData directory into the respective tables (parks, birds, mammals, reptiles, records, park_points, and park_shapes).
 - Log the status of each operation to data_loading.log, including verification of the data insertion process.
 
 Ensure the script runs without errors to fully populate your database with the extracted and transformed data, ready for analysis!
